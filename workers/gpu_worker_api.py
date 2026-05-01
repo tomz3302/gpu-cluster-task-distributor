@@ -17,7 +17,7 @@ MODEL_NAME = os.getenv("OLLAMA_MODEL", "smollm:135m")
 
 # Start with 1 for clean benchmarking.
 # Later you can test 2, 4, etc.
-MAX_CONCURRENT_INFERENCE = int(os.getenv("MAX_CONCURRENT_INFERENCE", "1"))
+MAX_CONCURRENT_INFERENCE = int(os.getenv("MAX_CONCURRENT_INFERENCE", "2"))
 
 client = Client(host=OLLAMA_HOST)
 inference_semaphore = asyncio.Semaphore(MAX_CONCURRENT_INFERENCE)
