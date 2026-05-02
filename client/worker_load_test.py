@@ -2,12 +2,13 @@ import asyncio
 import csv
 import statistics
 import time
+import os
 from pathlib import Path
 
 import httpx
 
 
-WORKER_URL = "http://localhost:8000/generate"
+WORKER_URL = os.getenv("WORKER_URL", "http://localhost:8000/generate")
 
 PROMPT = "Explain what load balancing is in one short paragraph."
 MAX_TOKENS = 64
@@ -37,10 +38,11 @@ async def send_request(client, request_id):
                 "query": PROMPT,
                 "max_tokens": MAX_TOKENS,
                 "temperature": TEMPERATURE,
+                "top_k": 3,
+                "use_rag": True,
             },
             timeout=180,
         )
-
         total_latency = time.perf_counter() - start
 
         if response.status_code != 200:

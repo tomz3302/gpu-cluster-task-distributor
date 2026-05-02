@@ -1,0 +1,424 @@
+Computer Abstractions and Technology
+Computer
+Chapter 1
+Part I
+Devices
+Memory
+Processor
+Chapter 1.Part I
+1of 30
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Agenda and Reading List
+• Course objectives (1.1, p. 8)
+• Chapter goals
+• Designing computers for performance (1.1, p. 7)
+• Understanding program performance  (1.1, p. 9)
+• Below your computer (1.3, pp. 13-14)
+• From a high-level language to the language of hardware (1.3, pp. 14-16)
+• The five classic components of a computer (1.4, pp. 16-17)
+• Abstractions (1.4, p. 22)
+• Instruction set architecture (ISA) (1.4, p. 22)
+• Foundational concepts and definitions
+• The task of a computer designer
+• New trends and key technologies (1.11, p. 53)
+• Technologies for building processors and memory (1.5, pp. 24-25)
+• Moore’s law (1.5, p. 25 and p. 44)
+• Case Study: AMD Barcelona microprocessor
+• Fallacies and pitfalls
+Chapter 1.Part I
+2of 30
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Course Objectives
+• to present the fundamental principles of computer organization using a 
+breadth approach and state the used terminology
+• to teach in detail the quantitative methods used in computer system 
+performance evaluation and emphasize their importance
+• to briefly show how to evaluate power and explain the power wall problem
+• to discuss and motivate the shift to multicore multiprocessors
+• to discuss the concepts of instruction set architecture and related design 
+principles
+• to introduce the architectural techniques used to design and build modern 
+high-performance microprocessors and microcomputers
+• to carefully explain modern RISC processor architecture and design
+• to get into details of building a pipelined RISC processor
+• to explain the issues involved in the design of the memory system, 
+especially caches
+Chapter 1.Part I
+3of 30
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Course Objectives (cont.)
+• By the time a student completes this course, he/she should 
+be able to answer the following questions:– How are programs written in a high level language, such as C or 
+Java, translated into the language of the hardware, and how 
+does the hardware execute the resulting program?– What is the interface between the software and the hardware, 
+and how does software instruct the hardware to perform 
+needed functions?– What determines the performance of a program, and how can a 
+programmer improve the performance?– What techniques can be used by hardware designers to improve 
+performance?– What are the reasons for and the consequences of the recent 
+switch from sequential processing to parallel processing?
+Chapter 1.Part I
+4of 30
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Chapter Goals
+• to lay the foundation for the rest of the course
+• to introduce and motivate the study of computer architecture, 
+organization, and hardware
+• to introduce the basic ideas and definitions
+• to present foundational concepts for learning computer organization
+• to discuss a variety of relevant abstractions
+• to introduce the stored-program concept
+• to place the major components of software and hardware in 
+perspective
+Chapter 1.Part I
+5of 30
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Designing Computers for Performance
+• Getting results quickly to users is critical in creating successful software
+• In the 1960s and 1970s, the size of the computer’s memory was a 
+primary constraint on computer performance– Minimize memory space to make programs fast
+• In the last decade, advances in computer design and memory 
+technology have reduced the importance of small memory size in most 
+applications– other than those in embedded systems
+• The simple 1960s memory model has been replaced by– the parallel nature of processors and – the hierarchical nature of memories
+• Knowledge of computer organization is required to build– competitive versions of compilers, – operating systems (OSs), – databases, and– applications
+Chapter 1.Part I
+6of 30
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed. Chapter 1.Part I 7of 30
+Understanding Program Performance
+Hardware or software 
+component
+How this component affects 
+performance?
+Algorithms used in the program
+Determine both the number of 
+source-level statements and the 
+number of I/O operations executed
+Software systems used to create and 
+translate the program into machine 
+instructions (programming languages, 
+compilers, and architectures)
+Determine the number of computer 
+instructions for each source-level 
+statement
+Processor and memory system Determine how fast instructions 
+can be executed
+I/O systems (hardware and OS) Determine how fast I/O operations 
+may be executed
+• The performance of a program depends on a combination of the 
+effectiveness of the algorithms, the software systems, and the  
+effectiveness of the computer in executing the machine instructions
+Below Your Program
+• A typical application may consist of millions of lines of code and rely 
+on sophisticated software libraries that implement complex 
+functions in support of the application
+• The hardware in a computer can only execute extremely simple 
+low-level instructions
+• To go from a complex application to the simple instructions involves 
+several layers of software that interpret high-level operations into 
+simple computer instructions
+• These layers of software are organized in a
+hierarchical fashion, with applications being 
+the outermost ring and a variety of systems 
+software sitting between the hardware and 
+the applications software
+Chapter 1.Part I
+8of 30
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Below Your Program (cont.)
+• Systems software provides services that are commonly useful
+• Two types of systems software are central to every computer 
+system today: operating systems (OSs) and compilers
+• The OS is a supervising program that manages the resources of a 
+computer for the benefit of the programs that run on that computer
+• An OS interfaces between a user’s program and the hardware
+• An OS provides a variety of services and supervisory functions, like:– Handling basic input and output operations– Allocating storage and memory– Providing for protected sharing of the computer among multiple 
+applications using it simultaneously
+• Compilers translate a program written in a high-level language 
+(HLL) (e.g., C, C++, Java) into assembly language instructions that 
+the hardware can execute
+Chapter 1.Part I
+9of 30
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+From a High-Level Language to the Hardware Language
+• Instructions and data are just 
+collection of bi
+nary digits
+(bits)
+• Instructions are individual commands 
+that computers understand and obey
+• Hardware executes machine
+instructions (extremely simple 
+low-level instructions)
+• Machine language is the binary 
+representation of machine 
+instructions
+• Assembly language symbolically 
+represents machine instructions
+• An assembler translates a symbolic 
+version of a machine instruction
+into its binary version
+• A high-level programming language 
+is composed of words and algebraic
+notation that can be translated by 
+a compiler into assembly language
+Chapter 1.Part I
+10 of 30
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+From an HLL to the Hardware Language (cont.)
+• Benefits of writing programs in high-level languages (HLLs)– Allows programmers to think in a more natural language, using 
+English words and algebraic notation, resulting in programs that 
+look much more like text than like tables of cryptic symbols– Allows languages to be designed according to their intended use
+• Fortran for scientific computation
+• Cobol for business data processing
+• Lisp for symbolic manipulation
+• Domain-specific languages for narrower groups of users– Improves programmer productivity
+• Conciseness is a clear advantage of high-level languages 
+over assembly language– Allows programs to be independent of the computer on which 
+they were developed, since compilers and assemblers can 
+translate high-level language programs to the binary instructions 
+of any computer
+Chapter 1.Part I
+11 of 30
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+The Five Classic Components of a Computer
+• Five classic components:– Memory: where instructions and 
+data are kept– Input: writes data to memory– Output: reads data from memory– Datapath: performs arithmetic 
+operations– Control: sends the signals that 
+determine the operations of the 
+datapath, memory, input, and 
+output according to instructions
+Computer
+Devices
+Memory
+Processor
+Chapter 1.Part I
+12 of 30
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+The Five Classic Components of a Computer (cont.)
+• Processor: manipulates instructions and data
+• A processor consists of datapath and control
+• This computer organization is independent of hardware 
+technology; you can place every piece of every 
+computer into one of these five categories
+• Underlying hardware in any computer performs the 
+same basic functions:– inputting data,– outputting data,– processing data, and– storing data
+Chapter 1.Part I
+13 of 30
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Abstraction
+• Abstraction is the use of hierarchical layers in structuring both 
+hardware and software 
+• Abstraction is a model that renders lower-level details of computer 
+systems temporarily invisible to facilitate design of sophisticated 
+systems
+• An abstraction omits unneeded details to cope with complexity 
+• Lower-level details are hidden to offer a simpler model at higher 
+levels
+• Digging into the depths reveals more information
+• The principle of abstraction is the way both hardware designers and 
+software designers cope with the complexity of computer systems
+Chapter 1.Part I
+14 of 30
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Instruction Set Architecture (ISA)
+• Instruction Set Architecture (ISA), or simply Architecture, of a 
+computer is an abstract interface between the hardware and the 
+lowest-level software
+• ISA is a key interface between the levels of abstraction
+• ISA is of the most important abstraction
+• ISA encompasses all the information necessary for programmers to 
+write a machine language program that will run correctly, including 
+instructions, registers, memory access, I/O devices, etc.
+• ISA standardizes instructions, machine language bit patterns, etc.
+• ISA allows computer designers to talk about functions independently 
+from the hardware that performs them
+• The ISA abstract interface enables many implementations (presumably 
+varying in cost and performance) to run identical software (same 
+architecture)
+Chapter 1.Part I
+15 of 30
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Instruction Set Architecture (cont.)
+• If an ISA is to be successful, it must be designed to survive changes in 
+hardware technology, software technology, and application 
+characteristics
+• However, focusing on the architecture sometimes prevents using new 
+innovations that require the interface to change
+• Application Binary Interface (ABI) is the combination of the basic 
+instruction set and the OS interface provided for application 
+programmers
+• ABI is the user portion of the instruction set plus the OS interfaces used 
+by application programmers
+• ABI defines a standard for binary portability across computers
+• Binary compatibility is extraordinarily important! It enables upgrading the 
+computer without having to replace software
+• Modern ISAs: x86/Pentium/K6,  PowerPC, MIPS, DEC Alpha, 
+SPARC/BLADE, HP PA
+Chapter 1.Part I
+16 of 30
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Foundational Concepts and Definitions
+• Computer architecture– in the past, often referred only to instruction set design– now, refers to the actual programmer-visible instruction set– includes ISA, organization, and hardware
+• Implementation– is the hardware that obeys the architecture abstraction– has two components: organization and hardware
+• Computer organization– includes the high-level aspects of computer’s design– memory, bus structure, CPU (ALU, branching, data transfer, etc.)
+• Hardware– refers to the specifics of a computer– includes details of logic design, packaging, etc.
+Chapter 1.Part I
+17 of 30
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Foundational Concepts and Definitions (cont.)
+• Some computers have identical ISAs, but different organization– Example: SPARCstation-2 and SPARCstation-20
+• Often a line of computers contains computers with identical ISAs 
+and nearly identical organizations, but differ in detailed 
+implementation– Example: SGI Indy differ in clock rate and cache structure
+• Some computers have the same architecture, but different 
+implementations to provide different performance and cost– Example: IBM 360 (introduced the concept of architecture)
+• Some computers offer upgraded implementations of the same 
+architecture to maintain upward compatibility– Example: x86 (8086 programs can run on Pentium 4)– Example: PowerPC architecture is different from the 680x0 
+one. 680x0 programs do not run well on PowerPC computers 
+and PowerPC programs do not run on 680x0 computers
+Chapter 1.Part I
+18 of 30
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Foundational Concepts and Definitions (cont.)
+• The stored-program concept– Instructions are represented as 
+numbers– Programs are stored in memory as 
+numbers to be read or written just 
+like data– Treating instructions in the same 
+way as data greatly simplifies both 
+the memory hardware and the 
+software of computer system– Memory technology needed for 
+data can also be used for programs
+• Principles:– Use of instructions that are 
+indistinguishable from numbers– Use of alterable memory for 
+programs
+Chapter 1.Part I
+19 of 30
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Individual Exercise (1)
+• The stored-program concept, introduced in the late 1940s, brought 
+about a significant change in how computers were designed and 
+operated
+1. What is a possible example of a nonstored-program computer, 
+2. and what are the problems with such a computer?
+3. How can these problems be overcome by a stored-program 
+computer?
+Chapter 1.Part I
+20 of 30
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Individual Exercise (1): Answer
+1. What is a possible example of a nonstored-program computer, 
+• Wired calculator
+2. and what are the problems with such a computer?
+• Without a stored program, the programmer must physically 
+configure the computer to run the desired program
+• Hence, a nonstored-program computer is one where the 
+computer must essentially be rewired to run the program.
+• The problem with such a computer is that much time must 
+be devoted to reprogramming it if one wants to either run 
+another program or fix bugs in the current program
+3. How can these problems be overcome by a stored-program 
+computer?
+• The stored-program concept is important in that a 
+programmer can quickly modify and execute a stored 
+program, resulting in the computer being more of a general
+purpose one instead of a specifically wired calculator
+Chapter 1.Part I
+21 of 30
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Foundational Concepts and Definitions (cont.)
+• Different computer architectures are classified into one of the 
+following two types:
+• Von Neumann (Princeton) architecture– Describes computers based on the following three key concepts:
+• Data and instructions are stored in a single read-write 
+memory
+• The contents of this memory are addressable by location, 
+without regard to the type of data contained there
+• Execution occurs in a sequential fashion (unless explicitly 
+modified) from one instruction to the next
+• Harvard architecture– traditionally: describes computers with separate memories; 
+one for data and the other for instructions– today: describes computers with a single main memory, but 
+with separate caches for instructions and data
+Chapter 1.Part I
+22 of 30
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+The Task of a Computer Designer
+• A computer designer:– determines what attributes are important for a new computer– then, designs a computer to maximize performance,– while staying within cost constraints
+• Task aspects:– instruction set design– functional organization– logic design– implementation (ICs, power, cooling, packaging, etc.)
+• Optimizing the design requires familiarity with:– logic design– compilers– OSs
+Chapter 1.Part I
+23 of 30
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+New Trends and Key Technologies
+• New computer organization ideas improved price/performance:– Exploiting parallelism in the program, via pipelining and multiple 
+processors– Exploiting locality of accesses to a memory hierarchy, via caches
+• Networking is an important and integral part of a computer system 
+• Key technologies for modern processors are compilers and silicon
+• Software that strongly affects computer hardware are: compilers 
+and OSs
+• Designers must be aware of trends in computer usage and  
+implementation technology that affect computer design
+• Changes in these trends motivate changes in ISA and shift the 
+payoff from important techniques, e.g., using pipelining and caching
+Chapter 1.Part I
+24 of 30
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed. Chapter 1.Part I 25of 30
+•Traditionally, each computer generation is 8 to 10 years 
+in length
+Technologies for Building Processors and Memory
+Generation Year
+Technology 
+used in 
+computers
+Relative 
+performance/
+unit cost
+Principal new 
+product
+1 1951 Vacuum tube 1 Commercial computers
+2 1965 Transistor 35 Cheap computers
+3 1975 IC 900 Minicomputer
+4 1995 VLSI 2,400,000 PC and workstations
+5 2005 ULSI 6,200,000,000 PC and workstations
+Moore’s Law: Transistor Count
+• Number of transistors on a chip doubles every 1.5 years
+• Cost of a chip has remained almost unchanged
+• Higher packing density means shorter paths and higher performance
+• Smaller chip sizes increase flexibility
+• Smaller chip sizes reduce power and thus cooling requirements
+• Fewer interconnections between chips increase reliability
+Chapter 1.Part I
+26 of 30
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Moore’s Law: Memory
+• Memory capacity doubles every 1.5 years (DRAM growth 
+rule: “Capacity quadrupled every three years”)
+• Due to advances in technology and organization
+Chapter 1.Part I
+27 of 30
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Moore’s Law: Processor
+• Processor speed doubles every 1.5 years (a speedup of 1.54 
+per year)
+• Only the top performance per year of workstations is shown
+• Performance is given as number of times faster than VAX-11/780
+• SPECint was used to produce these results (see performance)
+Chapter 1.Part I
+28 of 30
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Case Study: AMD Barcelona Microprocessor
+Chapter 1.Part I
+29 of 30
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Fallacies and Pitfalls
+• Fallacies (misbeliefs): commonly held misconceptions– Handle by a counterexample
+• Pitfalls: easily made mistakes– Generalizations of principles that are true in a limited context
+• Fallacy: computers have been built in the same, old
+fashioned way for far too long, and this antiquated 
+model of computation is running out of steam
+• Pitfall: ignoring the inexorable (cannot be changed) 
+progress of hardware when planning a new computer
+Chapter 1.Part I
+30 of 30
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.

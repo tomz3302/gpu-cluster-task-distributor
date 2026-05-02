@@ -1,0 +1,704 @@
+Review:  Major Components of a Computer
+Processor
+Control
+Datapath
+Memory
+Cache
+Main 
+Memory
+Devices
+Input
+Output
+Secondary 
+Memory
+(Disk)
+The Memory Hierarchy Goal
+ Fact:  Large memories are slow and fast memories are 
+small
+ How do we create a memory that gives the illusion of 
+being large, cheap and fast (most of the time)?
+ With hierarchy
+ With parallelism
+Second
+Level
+Cache
+(SRAM)
+A Typical Memory Hierarchy
+Control
+Datapath
+Secondary
+Memory
+(Disk)
+On-Chip Components
+RegFile
+Main
+Memory
+(DRAM)
+Data
+Cache
+Instr
+Cache
+ITLB DTLB
+Speed (%cycles): ½’s             1’s                  10’s                  100’s       10,000’s
+Size (bytes):    100’s   10K’s                 M’s                    G’s                    T’s
+Cost:         highest                                                                               lowest
+Take advantage of the principle of locality to present the 
+user with as much memory as is available in the 
+cheapest technology at the speed offered by the fastest
+technology
+Memory Hierarchy Technologies
+ Caches use SRAM for speed and technology 
+compatibility
+ Fast (typical access times of 0.5 to 2.5 nsec)
+ Low density (6 transistor cells), higher power, expensive ($2000 
+to $5000 per GB in 2008)
+ Static: content will last “forever” (as long as power is left on)
+ Main memory uses DRAM for size (density)
+ Slower (typical access times of 50 to 70 nsec) 
+ High density (1 transistor cells), lower power, cheaper ($20 to $75 
+per GB in 2008)
+ Dynamic: needs to be “refreshed” regularly (~ every 8 ms)- consumes1% to 2% of the active cycles of the DRAM
+ Addresses divided into 2 halves (row and column)- RASor Row Access Strobe triggering the row decoder- CASor Column Access Strobe triggering the column selector
+The Memory Hierarchy:  Why Does it Work?
+ Temporal Locality (locality in time)
+ If a memory location is referenced then it will tend to be 
+referenced again soon
+Keep most recently accessed data items closer to the processor
+ Spatial Locality (locality in space)
+ If a memory location is referenced, the locations with nearby 
+addresses will tend to be referenced soon
+Move blocks consisting of contiguous words closer to the 
+processor 
+The Memory Hierarchy:  Terminology
+ Block (or line): the minimum unit of information that is 
+present (or not) in a cache
+ Hit Rate: the fraction of memory accesses found in a level 
+of the memory hierarchy
+ Hit Time: Time to access that level which consists of
+Time to access the block + Time to determine hit/miss
+ Miss Rate: the fraction of memory accesses not found in a 
+level of the memory hierarchy     1 - (Hit Rate)
+ Miss Penalty: Time to replace a block in that level with the 
+corresponding block from a lower level which consists of
+Time to access the block in the lower level + Time to transmit that block 
+to the level that experienced the miss + Time to insert the block in that 
+level + Time to pass the block to the requestor
+Hit Time << Miss Penalty
+Characteristics of the Memory Hierarchy
+Processor
+Increasing 
+distance 
+from the 
+processor 
+in access
+time
+4-8 bytes (word)
+L1$
+8-32 bytes (block)
+L2$
+1 to 4 blocks
+Main Memory
+Inclusive
+what is in L1$ 
+is a subset of 
+what is in L2$  
+is a subset of 
+what is in MM 
+that is a 
+subset of is in 
+SM
+1,024+ bytes (disk sector = page)
+Secondary  Memory
+(Relative) size of the memory at each level
+How is the Hierarchy Managed?
+ registers  memory
+ by compiler (programmer?)
+ cache  main memory
+ by the cache controller hardware
+ main memory  disks
+ by the operating system (virtual memory)
+ virtual to physical address mapping assisted by the hardware 
+(TLB)
+ by the programmer (files)
+Cache Basics
+ Two questions to answer (in hardware):
+ Q1:  How do we know if a data item is in the cache?
+ Q2:  If it is, how do we find it?
+ Direct mapped
+ Each memory block is mapped to exactly one block in the 
+cache- lots of lower level blocks must share blocks in the cache
+ Address mapping (to answer Q2):
+(block address) modulo (# of blocks in the cache)
+ Have a tag associated with each cache block that contains 
+the address information (the upper portion of the address) 
+required to identify the block (to answer Q1)
+Caching:  A Simple First Example
+00
+01
+10
+11
+Cache
+Main Memory
+Q2: How do we find it?
+Usenext 2 low order 
+memory address bits –theindex –to 
+determine which 
+cache block (i.e., 
+modulo the number of 
+blocks in the cache)
+Tag Data
+Q1: Is it there?
+Compare the cache 
+tagto the high order 2 
+memory address bitsto 
+tell if the memory block 
+is in the cache
+Valid
+0000xx
+0001xx
+0010xx
+0011xx
+0100xx
+0101xx
+0110xx
+0111xx
+1000xx
+1001xx
+1010xx
+1011xx
+1100xx
+1101xx
+1110xx
+1111xx
+One word blocks
+Two low order bits 
+define the byte in the 
+word (32b words)
+(block address) modulo (# of blocks in the cache)
+Index
+Direct Mapped Cache
+ Consider the main memory word reference string
+Start with an empty cache - all 
+blocks initially marked as not valid
+0
+miss
+1
+miss
+0   
+1  
+ 2   
+3   4   3   4   15
+2
+miss
+00    Mem(0) 00    Mem(0)
+00    Mem(1)
+00    
+Mem(1)
+00    Mem(2)
+3
+miss
+00    Mem(0) 00    Mem(0)
+00    Mem(1)
+00    Mem(2)
+4
+miss
+01 4
+00    Mem(0)
+00    Mem(1)
+00    Mem(2)
+00    Mem(3)
+3
+01    
+00    
+hit
+Mem(4)
+Mem(1)
+00    
+00    
+Mem(2)
+Mem(3)
+ 8 requests, 6 misses
+4
+hit
+01    Mem(4)
+00    Mem(1)
+00    Mem(2)
+00    Mem(3)
+00    Mem(3)
+15
+miss
+01    Mem(4)
+00    Mem(1)
+00    Mem(2)
+00    Mem(3)
+11 15
+MIPS Direct Mapped Cache Example
+ One word blocks, cache size = 1K words (or 4KB)
+31 30     
+Hit
+Tag
+  . 
+. .     
+   13 12  11     
+. . .     
+   2
+  1  0
+20
+Index
+0
+1
+2
+.
+.
+.
+1021
+1022
+1023
+Valid
+Index
+Tag
+10
+Data
+Byte 
+offset
+20
+Data
+32
+What kind of locality are we taking advantage of?
+Multiword Block Direct Mapped Cache
+8
+Index
+Data Index Tag Valid
+0
+1
+2
+.
+.
+.
+253
+254
+255
+31 30   . . .         13 12  11    . . .    4  3 2  1 0
+Byte 
+offset
+20
+20 Tag
+Hit Data
+32
+Block offset
+Four  words/block, cache size = 1K words
+What kind of locality are we taking advantage of?
+Taking Advantage of Spatial Locality 
+ Let cache block hold more than one word
+Start with an empty cache - all 
+blocks initially marked as not valid
+0
+miss
+00    Mem(1)    Mem(0)
+0   1   2   3   4   3   4   15
+1
+hit
+00    Mem(1)    Mem(0)
+2
+miss
+00    Mem(1)    Mem(0)
+00    Mem(3)    Mem(2)
+3
+hit
+00    Mem(1)    Mem(0)
+00    Mem(3)    Mem(2)
+01    Mem(5)    Mem(4)
+00    Mem(3)    Mem(2)
+ 8 requests, 4 misses
+4
+01 5
+miss
+00    Mem(1)    Mem(0)
+00    Mem(3)    Mem(2)
+4
+hit
+11 15
+01    Mem(5)    Mem(4)
+00    Mem(3)    Mem(2)
+3
+4
+hit
+01    Mem(5)    Mem(4)
+00    Mem(3)    Mem(2)
+15
+miss
+14
+Miss Rate vs Block Size vs Cache Size
+Miss rate (%)
+Block size (bytes)
+8 KB
+16 KB
+64 KB
+256 KB
+ Miss rate goes up if the block size becomes a significant 
+fraction of the cache size because the number of blocks 
+that can be held in the same size cache is smaller 
+(increasing capacity misses)
+Cache Field Sizes
+ The number of bits in a cache includes both the storage 
+for data and for the tags
+ 32-bit byte address
+ For a direct mapped cache with 2n blocks, n bits are used for the 
+index
+ For a block size of 2m words (2m+2 bytes), m bits are used to 
+address the word within the block and 2 bits are used to address 
+the byte within the word
+ What is the size of the tag field?
+ The total number of bits in a direct-mapped cache is then
+2n x (block size + tag field size + valid field size)
+Handling Cache Hits
+ Read hits (I$ and D$)
+ this is what we want!
+ Write hits (D$ only)
+ require the cache and memory to be consistent- always write the data into both the cache block and the next level in 
+the memory hierarchy (write-through)- writes run at the speed of the next level in the memory hierarchy – so 
+slow! – or can use a write buffer and stall only if the write buffer is full
+ allow cache and memory to be inconsistent- write the data only into the cache block (write-back the cache block to 
+the next level in the memory hierarchy when that cache block is 
+“evicted”)- need a dirty bit for each data cache block to tell if it needs to be 
+written back to memory when it is evicted – can use a write buffer to 
+help “buffer” write-backs of dirty blocks
+Sources of Cache Misses
+ Compulsory (cold start or process migration, first 
+reference):
+ First access to a block, “cold” fact of life, not a whole lot you 
+can do about it.  If you are going to run “millions” of instruction, 
+compulsory misses are insignificant
+ Solution: increase block size (increases miss penalty; very 
+large blocks could increase miss rate)
+ Capacity:
+ Cache cannot contain all blocks accessed by the program
+ Solution: increase cache size (may increase access time)
+ Conflict (collision):
+ Multiple memory locations mapped to the same cache location
+ Solution 1: increase cache size
+ Solution 2: increase associativity (stay tuned) (may increase 
+access time)
+Handling Cache Misses (Single Word Blocks)
+ Read misses (I$ and D$)
+ stall the pipeline, fetch the block from the next level in the memory 
+hierarchy, install it in the cache and send the requested word to 
+the processor, then let the pipeline resume
+ Write misses (D$ only)
+1. stall the pipeline, fetch the block from next level in the memory 
+hierarchy, install it in the cache (which may involve having to evict 
+a dirty block if using a write-back cache), write the word from the 
+processor to the cache, then let the pipeline resume
+or
+2. Write allocate– just write the word into the cache updating both 
+the tag and data, no need to check for cache hit, no need to stall
+or
+3. No-write allocate– skip the cache write (but must invalidate that 
+cache block since it will now hold stale data) and just write the 
+word to the write buffer (and eventually to the next memory level), 
+no need to stall if the write buffer isn’t full
+Multiword Block Considerations
+ Read misses (I$ and D$)
+ Processed the same as for single word blocks – a miss returns 
+the entire block from memory
+ Miss penalty grows as block size grows- Early restart– processor resumes execution as soon as the 
+requested word of the block is returned- Requested word first– requested word is transferred from the 
+memory to the cache (and processor) first
+ Nonblocking cache– allows the processor to continue to access 
+the cache while the cache is handling an earlier miss
+ Write misses (D$)
+ If using write allocate must first fetch the block from memory and 
+then write the word to the block (or could end up with a “garbled” 
+block in the cache (e.g., for 4 word blocks, a new tag, one word 
+of data from the new block, and three words of data from the old 
+block)
+Average Memory Access Time (AMAT)
+ A larger cache will have a longer access time.  An 
+increase in hit time will likely add another stage to the 
+pipeline.  At some point the increase in hit time for a 
+larger cache will overcome the improvement in hit rate 
+leading to a decrease in performance.
+ Average Memory Access Time (AMAT) is the average to 
+access memory considering both hits and misses
+AMAT =  Time for a hit  +  Miss rate x Miss penalty
+ What is the AMAT for a processor with a 20 psec clock, a 
+miss penalty of 50 clock cycles, a miss rate of 0.02 
+misses per instruction and a cache access time of 1 
+clock cycle?
+Reducing Cache Miss Rates #1
+1. Allow more flexible block placement
+ In a direct mapped cache a memory block maps to 
+exactly one cache block
+ At the other extreme, could allow a memory block to be 
+mapped to any cache block – fully associative cache
+ A compromise is to divide the cache into sets each of 
+which consists of n “ways” (n-way set associative).  A 
+memory block maps to a unique set (specified by the 
+index field) and can be placed in any way of that set (so 
+there are n choices)
+(block address) modulo (# sets in the cache)
+Another Reference String Mapping
+ Consider the main memory word reference string
+Start with an empty cache - all 
+blocks initially marked as not valid
+0
+miss
+4
+0   4   0   4   0   4   0   4
+miss
+01 4
+00    Mem(0) 00    Mem(0)
+0
+00
+miss
+0
+4
+miss
+01 4
+01    Mem(4)
+00    Mem(0)
+00
+01    
+0
+miss
+Mem(4)
+0
+4
+miss
+01 4
+00    Mem(0)
+00
+01    Mem(4)
+0
+miss
+0
+4
+miss
+01 4
+00    Mem(0)
+ 8 requests, 8 misses
+ Ping pong effect due to conflict misses - two memory 
+locations that map into the same cache block
+Set Associative Cache Example
+0
+Cache
+Main Memory
+Q2: How do we find it?
+Usenext 1 low order 
+memory address bitto 
+determine which 
+cache set (i.e., modulo 
+the number of sets in 
+the cache)
+Tag Data
+Q1: Is it there?
+Compare all the cache 
+tagsin the set to the 
+high order 3 memory 
+address bitsto tell if 
+the memory block is in 
+the cache
+V
+0000xx
+0001xx
+0010xx
+0011xx
+0100xx
+0101xx
+0110xx
+0111xx
+1000xx
+1001xx
+1010xx
+1011xx
+1100xx
+1101xx
+1110xx
+1111xx
+Set
+1
+0
+1
+Way
+0
+1
+One word blocks
+Two low order bits 
+define the byte in the 
+word (32b words)
+Another Reference String Mapping
+ Consider the main memory word reference string
+Start with an empty cache - all 
+blocks initially marked as not valid
+0
+miss
+4
+0   4   0   4   0   4   0   4
+miss
+000    Mem(0) 000    Mem(0)
+0
+hit
+4
+hit
+000    Mem(0) 000    Mem(0)
+010    Mem(4) 010    Mem(4)
+ 8 requests, 2 misses
+010    Mem(4)
+ Solves the ping pong effect in a direct mapped cache 
+due to conflict misses since now two memory locations 
+that map into the same cache set can co-exist!
+Four-Way Set Associative Cache
+28= 256 sets each with four ways (each with one block)
+31 30       . . .        13 12  11     . . .        2  1  0 Byte offset
+Data Tag V
+0
+1
+2
+.
+.
+.
+253
+254
+255
+Data Tag V
+0
+1
+2
+.
+.
+.
+253
+254
+255
+Data Tag V
+0
+1
+2
+.
+.
+.
+253
+254
+255
+Index Data Tag V
+0
+1
+2
+.
+.
+.
+253
+254
+255
+8
+Index
+22 Tag
+Hit Data
+32
+4x1 select
+Way 0 Way 1 Way 2 Way 3
+Range of Set Associative Caches
+ For a fixed size cache, each increase by a factor of two 
+in associativity doubles the number of blocks per set (i.e., 
+the number or ways) and halves the number of sets 
+decreases the size of the index by 1 bit and increases 
+the size of the tag by 1 bit
+Used for tag compare
+Tag
+Selects the set
+Selects the word in the block
+Index
+Decreasing associativity
+Increasing associativity
+Direct mapped
+(only one way)
+Block offset Byte offset
+Fully associative
+(only one set)
+Smaller tags, only a 
+single comparator
+Tag is all the bits except
+block and byte offset
+Costs of Set Associative Caches
+ When a miss occurs, which way’s block do we pick for 
+replacement?
+ Least Recently Used (LRU): the block replaced is the one that    
+has been unused for the longest time- Must have hardware to keep track of when each way’s block was   
+used relative to the other blocks in the set- For 2-way set associative, takes one bit per set → set the bit when a 
+block is referenced (and reset the other way’s bit)
+ N-way set associative cache costs
+ N comparators (delay and area)
+ MUX delay (set selection) before data is available
+ Data available after set selection (and Hit/Miss decision).   In a 
+direct mapped cache, the cache block is available before the 
+Hit/Miss decision- So its not possible to just assume a hit and continue and recover later 
+if it was a miss
+Benefits of Set Associative Caches
+ The choice of direct mapped or set associative depends 
+on the cost of a miss versus the cost of implementation
+12
+10
+Miss Rate
+0 
+2 
+4 
+6 
+8
+4KB
+8KB
+16KB
+32KB
+64KB
+128KB
+1-way 2-way 4-way 8-way
+Associativity
+256KB
+512KB
+Data from Hennessy & 
+Patterson, Computer 
+Architecture, 2003
+ Largest gains are in going from direct mapped to 2-way 
+(20%+ reduction in miss rate)
+Summary:  Improving Cache Performance
+0. Reduce the time to hit in the cache
+ smaller cache
+ direct mapped cache
+ smaller blocks
+ for writes - no write allocate – no “hit” on cache, just write to write buffer- write allocate – to avoid two cycles (first check for hit, then write) 
+pipeline writes via a delayed write buffer to cache
+1. Reduce the miss rate
+ bigger cache
+ more flexible placement (increase associativity)
+ larger blocks (16 to 64 bytes typical)
+ victim cache – small buffer holding most recently discarded blocks 
+Summary:  Improving Cache Performance
+2. Reduce the miss penalty
+ smaller blocks
+ use a write buffer to hold dirty blocks being replaced so don’t 
+have to wait for the write to complete before reading 
+ check write buffer (and/or victim cache) on read miss – may get 
+lucky 
+ for large blocks fetch critical word first
+ use multiple cache levels – L2 cache not tied to CPU clock rate
+ faster backing store/improved memory bandwidth- wider buses- memory interleaving, DDR SDRAMs
+Summary: The Cache Design Space
+ Several interacting dimensions
+ cache size
+ block size
+ associativity
+ replacement policy
+ write-through vs write-back
+ write allocation
+ The optimal choice is a compromise
+ depends on access characteristics- workload- use (I-cache, D-cache, TLB)
+ depends on technology / cost
+ Simplicity often wins
+Cache Size
+Associativity
+Block Size
+Bad
+Good
+Factor A
+Factor B
+Less
+More

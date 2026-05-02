@@ -1,0 +1,51 @@
+Short Answer Questions
+
+What are the five major components of a computer? 
+
+Which type of memory is used for caches to prioritize speed and technology compatibility? 
+
+Which type of memory is used for main memory to prioritize high density and lower cost? 
+
+Approximately how often does dynamic memory (DRAM) need to be refreshed? 
+
+Which principle states that a recently referenced memory location will likely be referenced again soon? 
+
+Which principle states that locations with nearby addresses will likely be referenced soon after a memory location is accessed? 
+
+What is the minimum unit of information that can be present or missing in a cache? 
+
+What term describes the fraction of memory accesses successfully found in a level of the memory hierarchy? 
+
+What term describes the fraction of memory accesses that are not found in a level of the memory hierarchy? 
+
+What hardware component typically manages the mapping between the cache and main memory? 
+
+What software typically manages the mapping between main memory and disks? 
+
+In a direct mapped cache, how many cache blocks can a specific memory block be mapped to? 
+
+What happens to the miss rate when the block size becomes a significant fraction of the cache size? 
+
+What three fields make up the total number of bits required in a direct-mapped cache? 
+
+Which cache write policy writes data into both the cache block and the next level in the memory hierarchy? 
+
+Which cache write policy writes data only into the cache block and utilizes a dirty bit? 
+
+What type of cache miss is caused by the very first access to a block? 
+
+What type of cache miss occurs when the cache simply cannot contain all the blocks accessed by a program? 
+
+What type of cache miss occurs when multiple memory locations are mapped to the same exact cache location? 
+
+Which write miss policy skips writing to the cache entirely and only writes the word to the write buffer? 
+
+What does the acronym AMAT stand for in memory performance? 
+
+Which cache type allows a memory block to be mapped to any available block in the cache? 
+
+Which cache type divides the cache into sets where a memory block can be placed in any way within its assigned set? 
+
+Which block replacement policy replaces the cache block that has gone unused for the longest period of time? 
+
+What is the name of the small buffer used to hold the most recently discarded cache blocks?

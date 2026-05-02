@@ -1,33 +1,26 @@
 import os
 import time
 import asyncio
-from typing import Optional
+from typing import List, Dict, Any
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 from ollama import Client
 
+from rag.retriever import retrieve_context, build_rag_prompt
 
-# -----------------------------
-# Configuration
-# -----------------------------
 
 OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434")
 MODEL_NAME = os.getenv("OLLAMA_MODEL", "smollm:135m")
+MAX_CONCURRENT_INFERENCE = int(os.getenv("MAX_CONCURRENT_INFERENCE", "4"))
 
-# Start with 1 for clean benchmarking.
-# Later you can test 2, 4, etc.
-MAX_CONCURRENT_INFERENCE = int(os.getenv("MAX_CONCURRENT_INFERENCE", "2"))
+WORKER_NAME = os.getenv("WORKER_NAME", "worker-local")
 
 client = Client(host=OLLAMA_HOST)
 inference_semaphore = asyncio.Semaphore(MAX_CONCURRENT_INFERENCE)
 
-app = FastAPI(title="GPU Worker API", version="1.0")
+app = FastAPI(title="RAG GPU Worker API", version="1.0")
 
-
-# -----------------------------
-# Metrics state
-# -----------------------------
 
 metrics_lock = asyncio.Lock()
 
@@ -37,46 +30,39 @@ metrics = {
     "failed_requests": 0,
     "total_latency": 0.0,
     "total_queue_time": 0.0,
+    "total_retrieval_time": 0.0,
     "total_inference_time": 0.0,
 }
 
 
-# -----------------------------
-# Request/Response Models
-# -----------------------------
-
 class GenerateRequest(BaseModel):
     id: int
     query: str
-    max_tokens: int = Field(default=64, ge=1, le=512)
+    max_tokens: int = Field(default=128, ge=1, le=512)
     temperature: float = Field(default=0.2, ge=0.0, le=2.0)
+    top_k: int = Field(default=3, ge=1, le=10)
+    use_rag: bool = True
 
 
 class GenerateResponse(BaseModel):
     id: int
     model: str
     result: str
+    used_rag: bool
+    sources: List[Dict[str, Any]]
     queue_time: float
+    retrieval_time: float
     inference_time: float
     total_latency: float
 
 
-# -----------------------------
-# Helper function for Ollama
-# -----------------------------
-
-def run_ollama_inference(query: str, max_tokens: int, temperature: float) -> str:
-    """
-    Blocking Ollama call.
-    We run this inside asyncio.to_thread() so FastAPI does not block the event loop.
-    """
-
+def run_ollama_inference(prompt: str, max_tokens: int, temperature: float) -> str:
     response = client.chat(
         model=MODEL_NAME,
         messages=[
             {
                 "role": "user",
-                "content": query,
+                "content": prompt,
             }
         ],
         options={
@@ -85,23 +71,19 @@ def run_ollama_inference(query: str, max_tokens: int, temperature: float) -> str
         },
     )
 
-    # Works with recent ollama-python versions
     if hasattr(response, "message"):
         return response.message.content
 
-    # Fallback for dict-style response
     return response["message"]["content"]
 
-
-# -----------------------------
-# API Endpoints
-# -----------------------------
 
 @app.get("/health")
 async def health():
     return {
         "status": "ok",
+        "worker_name": WORKER_NAME,
         "model": MODEL_NAME,
+        "rag_enabled": True,
         "max_concurrent_inference": MAX_CONCURRENT_INFERENCE,
     }
 
@@ -114,10 +96,12 @@ async def get_metrics():
         if completed > 0:
             average_latency = metrics["total_latency"] / completed
             average_queue_time = metrics["total_queue_time"] / completed
+            average_retrieval_time = metrics["total_retrieval_time"] / completed
             average_inference_time = metrics["total_inference_time"] / completed
         else:
             average_latency = 0.0
             average_queue_time = 0.0
+            average_retrieval_time = 0.0
             average_inference_time = 0.0
 
         return {
@@ -128,31 +112,52 @@ async def get_metrics():
             "failed_requests": metrics["failed_requests"],
             "average_latency": average_latency,
             "average_queue_time": average_queue_time,
+            "average_retrieval_time": average_retrieval_time,
             "average_inference_time": average_inference_time,
         }
 
 
 @app.post("/generate", response_model=GenerateResponse)
-async def generate(request: GenerateRequest):
+async def generate(
+    request: GenerateRequest,
+):
     request_start = time.perf_counter()
 
     async with metrics_lock:
         metrics["active_requests"] += 1
 
     try:
-        # Queue starts when request arrives.
         queue_start = time.perf_counter()
 
-        # Only allow a limited number of simultaneous LLM calls.
         async with inference_semaphore:
             queue_end = time.perf_counter()
             queue_time = queue_end - queue_start
+
+            retrieval_time = 0.0
+            sources = []
+
+            if request.use_rag:
+                retrieval_result = await asyncio.to_thread(
+                    retrieve_context,
+                    request.query,
+                    request.top_k,
+                )
+
+                retrieval_time = retrieval_result["retrieval_time"]
+                sources = retrieval_result["sources"]
+
+                prompt = build_rag_prompt(
+                    request.query,
+                    retrieval_result["context"],
+                )
+            else:
+                prompt = request.query
 
             inference_start = time.perf_counter()
 
             result = await asyncio.to_thread(
                 run_ollama_inference,
-                request.query,
+                prompt,
                 request.max_tokens,
                 request.temperature,
             )
@@ -166,13 +171,17 @@ async def generate(request: GenerateRequest):
             metrics["completed_requests"] += 1
             metrics["total_latency"] += total_latency
             metrics["total_queue_time"] += queue_time
+            metrics["total_retrieval_time"] += retrieval_time
             metrics["total_inference_time"] += inference_time
 
         return GenerateResponse(
             id=request.id,
             model=MODEL_NAME,
             result=result,
+            used_rag=request.use_rag,
+            sources=sources,
             queue_time=queue_time,
+            retrieval_time=retrieval_time,
             inference_time=inference_time,
             total_latency=total_latency,
         )

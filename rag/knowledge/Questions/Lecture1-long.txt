@@ -1,0 +1,51 @@
+Long Answer Questions
+
+What are the core course objectives related to computer organization and evaluation?
+
+What must a hardware designer consider regarding program translation by the end of this course?
+
+How do the processor and memory system, and I/O systems affect program performance?
+
+Describe the hierarchical software layers that sit below an application program.
+
+Outline the specific services and supervisory functions provided by an operating system.
+
+Explain the translation steps from a high-level programming language to the hardware language.
+
+What are the primary benefits of writing programs in a high-level language?
+
+Define the roles of the Memory, Datapath, and Control components in a computer.
+
+Why is abstraction a crucial principle for hardware and software designers?
+
+Detail the purpose and importance of the Instruction Set Architecture.
+
+What is the Application Binary Interface and why does it matter?
+
+Contrast computer architecture with computer organization.
+
+Can two computers have the same architecture but different implementations? Explain with examples.
+
+What are the core principles of the stored-program concept?
+
+What are the operational problems with a nonstored-program computer?
+
+How does the stored-program concept solve the issues of physical rewiring?
+
+What are the three key concepts defining a Von Neumann architecture?
+
+Detail the different aspects of a computer designer's task.
+
+What areas of expertise must a computer designer be familiar with to optimize a design?
+
+What new computer organization ideas have historically improved price and performance?
+
+How does hardware implementation technology motivate ISA changes?
+
+Outline the generational progression of technology used in computers from 1951 to 2005.
+
+Aside from transistor count, what are the benefits of smaller chip sizes according to Moore's Law?
+
+How do memory capacity and processor speed grow according to Moore's Law?
+
+Provide examples of high-level languages designed for specific uses.

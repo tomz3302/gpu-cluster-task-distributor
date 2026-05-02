@@ -1,0 +1,51 @@
+Short Answer Questions
+
+What are instructions in the context of a computer's language?
+
+What is an instruction set?
+
+How many operands must a MIPS arithmetic instruction have?
+
+How many registers does the MIPS architecture have?
+
+What is the size of a word in the MIPS architecture?
+
+What is the MIPS convention for naming registers?
+
+Which MIPS register always maps to the constant value zero?
+
+What is the purpose of the MIPS $ra register?
+
+What is the byte order known as endianness used by MIPS?
+
+Which instruction copies a word from memory to a register in MIPS?
+
+Which instruction copies a word from a register to memory in MIPS?
+
+Why doesn't MIPS have a subtract immediate instruction?
+
+Which logical instruction is used to implement a NOT operation in MIPS?
+
+What is the length of all MIPS instructions in bits?
+
+What are the three instruction formats in MIPS?
+
+What does the op field in a MIPS instruction format specify?
+
+What does the rd field stand for in the MIPS R-format?
+
+What is the interface between software and hardware called?
+
+What is a basic block in compilation?
+
+What are pseudoinstructions in MIPS?
+
+Which addressing mode uses the sum of the current PC and a constant in the instruction?
+
+What does the MIPS jal instruction do?
+
+What does CISC stand for?
+
+What does RISC stand for?
+
+In a stack architecture, where do all operations occur?

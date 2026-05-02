@@ -1,0 +1,2914 @@
+Performance and the Power Wall
+Computer
+Chapter 1
+Part II
+Devices
+Memory
+Processor
+Chapter 1.Part II 1 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Agenda and Reading List
+• Chapter goals
+• Introduction (1.6, pp. 28-29 and 1.11, p. 53)
+• Measuring and defining performance (1.6, pp. 28-33)
+• The CPU performance equation (1.6, pp. 33-40 and 1.11, p. 52)
+• MIPS, FLOPS, MOPS, and MFLOPS metrics (1.9, p. 51)
+• Amdahl's law in computing (1.10, pp. 49-50)
+• The power wall (1.7, pp. 40-42 and 1.8, p. 52)
+• The switch from uniprocessors to multiprocessors (1.8, pp. 43-45)
+• Measuring performance using benchmarks (1.9, p. 46)
+• Measuring performance using SPEC (1.9, pp. 46-49)
+• Reporting performance
+• Summarizing and comparing performance (1.9, pp. 47-48)
+• Fallacies and pitfalls (1.10, pp. 49-51)
+Chapter 1.Part II 2 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Chapter Goals
+• to introduce basic performance measures and the relevance of performance to 
+computer design
+• to describe different ways in which performance can be determined
+• to describe the metrics for measuring performance from the viewpoint of both 
+a computer user and a designer
+• to look at how performance metrics are related 
+• to present the classical processor performance equation
+• to justify the use of CPU time as the only adequate performance measure
+• to find the factors that make up and those that influence CPU time
+• to discuss the limitations of the different performance measurements
+• to provide important insights and principles necessary to know how to evaluate 
+the performance of a computer system
+• to introduce Amdahl’s law and emphasis its importance
+• to show how to evaluate power and explain the power wall problem
+• to motivate the shift to multicore multiprocessors
+• to study benchmarks and their suitability for use in evaluating performance
+• to describe how best to choose benchmarks to evaluate computers and how to 
+accurately summarize the performance of a group of programs
+• to briefly introduce SPEC benchmarks
+• to discuss how to measure, report, summarize, and compare performance
+Chapter 1.Part II 3 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Measuring Performance
+• Program execution time is the measure of computer performance:– Also known as response time, elapsed time, or latency– It is the time between the start and completion of a task– It is the wall-clock time– Measured in seconds per program– The computer that performs the same amount of work in the least time 
+is the fastest– Important for individual computer users– Focus of embedded or desktop computers
+• Throughput or bandwidth could also be used to measure performance:– It is the total amount of work done in a given time– Important for datacenter managers– Focus of servers
+• Decreasing execution time almost always improves throughput
+• Changing either execution time or throughput often affects the other
+Chapter 1.Part II 4 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Defining Time
+• Program execution time can be defined in different ways:– Execution (response or elapsed) time
+• the total time required for the computer to complete a task
+• the time between the start and completion of a task
+• counts everything: disk accesses, memory accesses, I/O activities, 
+OS overhead, CPU execution time, time spent in other programs, 
+etc.
+• it is the time experienced by the user
+• not useful for time sharing comparisons
+• execution time on unloaded system expresses system performance– CPU execution time (simply CPU time)
+• the actual time the CPU spends computing a task’s lines of code
+• does not include time spent waiting for I/O activities or running 
+other programs
+Chapter 1.Part II 5 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Defining Time (cont.)
+• CPU time can be further divided into:– User CPU time
+• the CPU time spent in the program itself
+• expresses CPU performance
+• our focus for assessing performance– System CPU time
+• the CPU time spent in the OS performing tasks on behalf of 
+the program
+• It is hard to differentiate between user CPU time and system CPU 
+time since:– it is often hard to assign responsibility for OS activities to one 
+user program rather than another– functionalities differ among OSs
+Chapter 1.Part II 6 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Individual Exercise (1)
+• Do the following changes to a computer system increase 
+throughput, decrease response time, or both?
+1. Replacing the processor in a computer with a faster version
+2. Adding additional processors to a system that uses multiple 
+processors for separate tasks, e.g., searching the WWW
+Chapter 1.Part II 7 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Individual Exercise (1): Answer
+• Do the following changes to a computer system decrease response 
+time, increase throughput, or both?
+1. Replacing the processor in a computer with a faster version
+• Both response time and throughput are improved
+2. Adding additional processors to a system that uses multiple 
+processors for separate tasks, e.g., searching the WWW
+• No one task gets work done faster
+• Only throughput increases
+• If demand for processing is as large as the throughput, the 
+system might force requests to queue up
+• In this case, increasing the throughput could also improve 
+response time, since it would reduce the waiting time in the 
+queue
+Chapter 1.Part II 8 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Defining Performance
+• Performance is always relative to a specific program
+• To maximize performance, minimize response time or execution 
+time for some task 
+• For two computers X and Y running a certain program, 
+Performanc
+e
+Performanc
+=
+X
+e
+X
+1
+Execution 
+>
+time
+X
+Performanc
+e
+Y
+
+Execution
+• “X is n times faster than Y” means:
+time
+Performanc
+Performanc
+e
+e
+X
+X
+Y
+<
+=
+Execution
+Execution
+time
+time
+Execution
+time
+X 
+Y
+Y
+=
+n
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Chapter 1.Part II 9 of 116
+Individual Exercise (2)
+• If computer A runs a program in 10 seconds and 
+computer B runs the same program in 15 seconds– How much faster is A than B?
+Chapter 1.Part II 10 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Individual Exercise (2): Answer
+• If computer A runs a program in 10 seconds and 
+computer B runs the same program in 15 seconds– How much faster is A than B?
+Performanc
+Performanc
+e
+e
+B 
+A
+=
+Execution
+Execution
+time
+time
+A 
+B
+=
+15 =
+10
+1
+.
+5
+A is therefore 1.5 times faster than B for this program
+Chapter 1.Part II 11 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Individual Exercise (3)
+• Computer C’s performance is 4 times faster than the 
+performance of computer B, which runs a given 
+application in 28 seconds– How long will computer C take to run that 
+application?
+Chapter 1.Part II 12 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Individual Exercise (3): Answer
+• Computer C’s performance is 4 times faster than the performance of 
+computer B, which runs a given application in 28 seconds– How long will computer C take to run that application?
+Performanc
+e
+Performanc
+B 
+C
+e
+=
+4
+=
+Execution
+Execution
+Execution timeC = 7 seconds
+time
+C 
+B
+time
+=
+28
+Execution
+time
+C
+Thus, it takes computer C 7 seconds to run that application
+Chapter 1.Part II 13 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Clock Cycles
+• Computers are constructed using clocks running at constant rates
+• Clock cycles indicate when events take place in the hardware (one 
+abstraction)
+time
+• Instead of reporting execution time in seconds, we often use cycles
+• Clock cycles: ticks, clock ticks, clock periods, clocks, cycles
+• We can count the number of CPU clock cycles for a program
+• Clock cycle time/period (T):– time for a complete clock cycle– time between ticks– seconds per cycle
+• Clock rate/frequency (R):– the inverse of the clock period, i.e.,– cycles per second
+R 1 =
+T
+Chapter 1.Part II 14 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Static and Dynamic Instruction Count
+• Static instruction count is the number of instructions 
+the program has
+• Dynamic instruction count is the actual number of 
+instructions executed by the CPU for a specific program 
+execution– We usually use dynamic instruction count as if, for 
+example, you have a loop in your program then some 
+instructions get executed more than once– Also, in the presence of branches, some instructions 
+may not be executed at all
+Chapter 1.Part II 15 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Clock Cycles Per Instruction
+• Different instructions take different amounts of time depending on 
+what they do:– Multiplication takes more time than addition– Floating-point operations take longer than integer ones– Accessing memory takes more time than accessing registers
+• Instructions can be divided into classes of similar instructions
+• Instructions in the same class have the same C
+lock cycles P
+I
+nstruction (CPI) value
+er 
+• Total CPU clock cycles for a certain program can be calculated by 
+looking at various instruction classes and their individual CPIs
+CPU clock 
+cycles
+for
+a
+program
+= =
+n
+i
+
+1
+(
+CPI
+i
+x
+C
+i
+)– CPIi is the clock cycles per instruction for class i (integer number),– Ci is the count of instructions executed from class i, and– n is the number of instruction classes
+Chapter 1.Part II 16 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed. Chapter 1.Part II 17of 116
+• Average CPI(CPIaverageor just CPI)for a certain program is the 
+average number of clock cycles each instruction takes to execute
+thus,
+then,–C is the number of instructions executed by the program (known as the 
+instruction count, instruction path length, or dynamic program size)
+• let the fraction of occurrence (relative frequency) of an instruction class 
+in a program be
+then,
+• Thus, CPI depends on the instruction mix(the dynamic frequency of 
+instructions across the program)
+Clock Cycles Per Instruction (cont.)
+C
+program a for cycles clock CPU
+count n Instructio
+program a for cycles clock CPU CPI     
+ 
+     = =
+=
+= = n
+i i i
+Cx CPI Cx CPI program a for cycles CPU clock 1
+)  (     
+ 
+=
+= = = n
+i
+i
+i
+n
+i i i
+C
+C x CPI C
+Cx CPI CPI 1
+1 )  ( )  (
+C
+C C i
+fraction i
+= =
+= n
+i fraction i i
+x CPI CPI 1
+) C  (
+Instructions Per Clock Cycle
+• CPI provides one way of comparing two different 
+implementations of the same ISA, since the number of 
+instructions executed for a program will be the same
+• Although we might expect that the minimum CPI is 1.0, 
+some processors fetch and execute multiple instructions 
+per clock cycle (e.g., multicore microprocessors as will 
+be shown later)
+• We could invert CPI to talk about IPC, or instructions 
+per clock cycle
+Chapter 1.Part II 18 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed. Chapter 1.Part II 19of 116
+The CPU Performance Equation
+• The CPU time for a program can be expressed in two ways:
+or
+•As
+• Then, we could express the CPU performance equation as follows:
+or
+•Here is how pieces fit together:
+time cycle Clock program a for
+cycles clock CPU
+program a for
+ion time CPU execut       × =
+ate r Clock program a for
+cycles clock CPU
+program a for
+ion time CPU execut
+ 
+1      × =
+=
+= = n
+i i i
+Cx CPI Cx CPI program a for cycles CPU clock 1
+)  (     
+( ) T Cx CPI T C CPI time CPU n
+i i i
+× = × × = =1
+)  ( 
+( ) R Cx CPI R C CPI time CPU n
+i i i
+1 )  ( 1 1
+× = × × = =
+ 
+
+
+ 
+
+ × 
+
+
+ 
+
+ × 
+  
+ = 
+
+
+ 
+
+
+cycle Clock
+Seconds T rogram P
+ns Instructio C n Instructio
+cycles Clock CPI rogram P
+Seconds time CPU       
+The CPU Performance Equation (cont.)
+• CPU performance is dependent upon three factors:
+Dependency
+Factors
+Algorithm
+Programming
+Compiler
+ISA
+Processor 
+implementation
+Average clock cycles per instruction (CPI) √ √ √ √ √
+Instruction count (C)
+√ √ √ √
+Clock cycle time (clock rate) (T or R)
+Technology
+√ √ √
+• CPU time is equally dependent on these three factors: a 10% 
+improvement in any one of them leads to 10% gain in CPU time
+Chapter 1.Part II 20 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Individual Exercise (4)
+• Suppose you wish to run a program P with 7.5 × 109
+instructions on a 5 GHz computer with a CPI of 0.8
+• What is the expected CPU time?
+• When you run P, it takes 3 seconds of wall clock time 
+to complete
+• What is the percentage of the CPU time P received?
+Chapter 1.Part II 21 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed. Chapter 1.Part II 22of 116
+Individual Exercise (4): Answer
+• Suppose you wish to run a program P with 7.5 ×109
+instructions on a 5 GHz computer with a CPI of 0.8 •What is the expected CPU time?
+•When you run P, it takes 3 seconds of wall clock time 
+to complete •What is the percentage of the CPU time P received?
+ seconds R
+C CPI time CPU Expected 2.1 10 5
+10 5.7 8.0
+9
+9
+= ×
+× × = × =
+%40 4.0 3
+2.1 = = =
+=
+time Wall
+time CPU Expected                         
+ received P time CPU of Percentage
+Individual Exercise (5)
+• A given application written in Java runs in 15 seconds 
+on a desktop processor
+• A new Java compiler is released that requires only 0.6 
+as many instructions as the old compiler
+• Unfortunately, it increases the CPI by 1.1
+• How fast can we expect the application to run using 
+new compiler?
+Chapter 1.Part II 23 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed. Chapter 1.Part II 24of 116
+Individual Exercise (5): Answer
+• A given application written in Java runs in 15 seconds on a desktop 
+processor • A new Java compiler is released that requires only 0.6 as many 
+instructions as the old compiler • Unfortunately, it increases the CPI by 1.1
+• How fast can we expect the application to run using new compiler?
+As it is the same computer, clock period is the same (T)
+xT xC CPI time CPU 1 1 1 15= =
+99 15 6011 6011 60 11 1 1 1 1 2 . x . x . xT xC CPI ) . x . ( xT ) C . (x) CPI . ( time CPU = = ∗ = ∗ ∗ =
+51 99
+15
+2
+1
+1
+2 . . time Execution
+time Execution
+e Performanc
+e Performanc = = =
+Group Exercise (6)
+• A compiler designer is trying to decide between two code 
+sequences for a particular computer
+• The hardware designers have supplied the fact that the computer 
+has three different classes of instructions: Class A, Class B, and 
+Class C, which require one, two, and three cycles, respectively
+• For a particular high-level language statement, the compiler writer 
+is considering two code sequences that require the following 
+instruction counts:– The first code sequence requires 2 Class A instructions, 1 Class 
+B instruction, and 2 Class C instructions– The second code sequence requires 4 Class A instructions, 1 
+Class B instruction, and 1 Class C instruction
+1. Which code sequence executes the most instructions?
+2. Which code sequence will be faster?
+3. What is the CPI for each sequence?
+Chapter 1.Part II 25 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed. Chapter 1.Part II 26of 116
+Group Exercise (6): Answer
+1.Which code sequence executes the most instructions?
+Code sequence executes 2 + 1 + 2 = 5 instructions
+Code sequence executes 4 + 1 + 1 = 6 instructions (more!)
+2.Which code sequence will be faster?
+3.What is the CPI for each code sequence?                                     
+ cycles ) x ( ) x ( ) x ( cycles CPU clock 10 2 3 1 2 2 1 1 = + + =
+ cycles ) x ( ) x ( ) x ( cycles CPU clock 9 1 3 1 2 4 1 2 = + + =
+2 5
+10
+1
+1
+1 = = = count n Instructio
+cycles clock CPU CPI
+5.1 6
+9
+2
+2
+2 = = = count n Instructio
+cycles clock CPU CPI
+(faster!)
+Group Exercise (7)
+• Our favorite program runs in 10 seconds on computer 
+A, which has a 2 GHz clock
+• We are trying to help a computer designer build a 
+computer B, which will run this program in 6 seconds
+• The designer has determined that a substantial increase 
+in the clock rate is possible, but this increase will affect 
+the rest of the CPU design, causing computer B to 
+require 1.2 times as many clock cycles as computer A 
+for this program
+• What clock rate should we tell the designer to target?
+Chapter 1.Part II 27 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed. Chapter 1.Part II 28of 116
+Group Exercise (7): Answer
+• Our favorite program runs in 10 seconds on computer A, which has a 2 
+GHz clock •We are trying to help a computer designer build a computer B, which 
+will run this program in 6 seconds • The designer has determined that a substantial increase in the clock 
+rate is possible, but this increase will affect the rest of the CPU design, 
+causing computer B to require 1.2 times as many clock cycles as 
+computer A for this program •What clock rate should we tell the designer to target?
+• Lets first find the number of clock cycles required for the program on A:
+thus,
+so
+which leads to
+9 10 2
+10
+x
+    rate Clock
+cycles clock CPU cycles clock CPU time CPU A
+A
+A
+A
+=  =
+cycles x cycles clock CPU A
+9 10 20 =
+B B
+B
+B Clock rate
+x x .    Clock rate
+cycles CPU clock CPU time 9 10 20 21 6=  =
+GHz Clock rateB
+4=
+Individual Exercise (8)
+• Suppose we have two implementations of the same 
+ISA:– Computer A has a clock cycle time of 250 ps and a 
+CPI of 2.0 for some program– Computer B has a clock cycle time of 500 ps and a 
+CPI of 1.2 for the same program
+• Which computer is faster for this program and by how 
+much?
+Chapter 1.Part II 29 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed. Chapter 1.Part II 30of 116
+Individual Exercise (8): Answer
+• Suppose we have two implementations of the same ISA:– Computer A has a clock cycle time of 250 psand a CPI of 2.0 
+for some program– Computer B has a clock cycle time of 500 psand a CPI of 1.2 
+for the same program
+•Which computer is faster for this program and by how much?
+Both computers execute the same number of instructions (C)
+Thus, computer A is faster:
+  ps x C  C . CPU timeA
+500 250 02 = × × =
+ ps x C  C . CPU timeB
+600 500 21 = × × =
+2.1 5
+6 = = = C x 00
+C x 00
+time Execution
+time Execution
+e Performanc
+e Performanc
+A
+B
+B
+A
+Individual Exercise (9)
+• Consider program P, which runs on a 1 GHz computer M 
+in 10 seconds
+• An optimization is made to P, replacing all instances of 
+multiplying a value by 4 (mult X, X, 4) with two 
+instructions that set x to x + x twice (add X, X; add X, X)
+• Call this new optimized program P’
+• After recompiling, the program now runs in 9 seconds on 
+computer M
+• The CPI of a multiply instruction is 4, and the CPI of an 
+add is 1
+• How many multipliers were replaced by the new 
+compiler?
+Chapter 1.Part II 31 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed. Chapter 1.Part II 32of 116
+Individual Exercise (9): Answer
+• This leaves 10×109-9×109 = 109 less cycles after the optimization
+• Everytimewe replace a mult instruction with two add instructions, it 
+takes 1 ×4 –2 ×1 = 2 cycles less per replacement
+• Thus, there must have been 109cycles / (2 cycles/replacement) = 
+0.5 ×109replacements to make P into P’
+9
+9
+10 10
+10 1 10
+× = 
+× =  =
+cycles clock CPU
+cycles clock CPU cycles clock CPU time CPU
+P
+P P
+P
+    rate Clock
+9
+'
+9
+' '
+'
+10 9
+10 1 9
+× = 
+× =  =
+cycles clock CPU
+cycles clock CPU cycles clock CPU time CPU
+P
+P P
+P
+    rate Clock
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed. Chapter 1.Part II 33of 116
+The CPU Performance Equation (cont.)
+Hardware or 
+software component
+Affects 
+what? How?
+Algorithm
+possibly 
+CPI
+Algorithm affects the CPI by favoring slower or 
+faster instructions
+C
+Algorithm determines the number of source 
+program instructions (and hence the number of 
+processor instructions) executed
+Programming language
+CPI Language features affect CPI
+C Statements in the language are translated to 
+processor instructions, which determine C
+Compiler
+CPI Compiler affects the CPI by favoring slower or 
+faster instructions
+C Compiler determines the translation of the 
+source instructions into computer instructions
+Instruction set 
+architecture (ISA)
+CPI ISA affects the cost in cycles of each instruction
+C ISA affects the instructions needed for a function
+T ISA affects the overall clock rate of the processor
+Individual Exercise (10)
+• Show, by examples, how a program’s CPI is affected by 
+the used algorithm and programming language
+Chapter 1.Part II 34 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Individual Exercise (10): Answer
+• Show, by examples, how a program’s CPI is affected by 
+the used algorithm and programming language
+• Algorithm– If the algorithm uses more floating-point operations, 
+it will tend to have a higher CPI
+• Programming language– A language with heavy support for data abstraction 
+(e.g., Java) will require indirect calls, which will use 
+higher CPI instructions
+Chapter 1.Part II 35 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed. Chapter 1.Part II 36of 116
+• IPS: Instructions Per Second (instruction execution rate) •MIPS: Million Instructions Per Second
+• Problems with using MIPS as a measure for comparing computers:–MIPS specifies the instruction execution rate but does not take into 
+account instruction capabilities. We cannot use it to compare computers 
+with different ISAs, since instruction counts will certainly differ–MIPS varies between programs on the same computer; thus a computer 
+cannot have a single MIPS rating for all programs–MIPS can vary inversely/independently with performance, for example:
+• Since it generally takes more clock cycles per floating-point 
+instructions than per integer instructions, floating-point programs 
+using the optional hardware instead of software floating-point 
+routines take less time but have a lower MIPS rating
+• Software floating-point routines execute simpler instructions, 
+resulting in higher MIPS rating, but they execute so many more 
+causing overall execution time to be longer • Same architecture computers can be compared using MIPS
+MIPS Metrics
+6 6 6 6 10 10
+1
+10 10 x CPI
+R
+ x T x CPI x T x C x CPI
+C
+ x time  Execution
+count  n Instructio MIPS Native = = = =
+MIPS Metrics (cont.)
+• Peak MIPS: the fastest native MIPS rate a computer can achieve– Measured using an instruction sequence chosen to maximize this rate– It is obtained by choosing an instruction mix that minimizes the CPI, 
+even if that instruction mix is totally impractical
+• Relative MIPS is MIPS that is relative to some agreed-upon reference 
+computer:
+Rel
+ative MIPS
+=
+Time
+Time
+reference x MIPS
+unrated
+reference
+where
+Timereference = Execution time on a reference computer
+Timeunrated = Execution time on the computer to be rated
+MIPSreference = Reference computer’s agreed-upon MIPS rating– Problems with relative MIPS:
+• It is proportional to execution time only for a given program and a 
+given input
+• It becomes harder to find a reference computer on which to run 
+programs as the computer ages
+• Software gets faster over time on the reference computer
+• MIPS measurements are not good performance metrics!
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Chapter 1.Part II 37 of 116
+FLOPS, MOPS, and MFLOPS Metrics
+• FLOPS: floating-point operations per second
+• MOPS:million operations per second
+• MFLOPS: million floating-point operations per second
+Native
+MFLOPS
+=
+F
+Execution
+loating
+time
+of
+point
+i
+nstruction
+floating
+count
+point
+instructio
+ns
+x
+10
+6
+• Problems with MFLOPS:– Although a program running on different computers will execute the 
+same number of floating-point operations, the set of floating-point 
+operations is not consistent across computers thus, the number of 
+floating-point operations may vary– It changes not only according to the mixture of integer and floating-point 
+operations but also according to the mixture of fast and slow floating
+point operations (normalized MFLOPS is the solution!)
+• Normalized MFLOPS:– weights floating-point operations, giving complex ones larger weight– allows a computer to achieve a high MFLOPS rating even if the program 
+contains many slow floating-point operations
+• Peak MFLOPS: the maximum MFLOPS rate possible for any code
+• Above metrics are not applicable outside their range of usage!
+Chapter 1.Part II 38 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Home Exercise (11)
+• If you run a certain program on two different 
+computers that have the same ISA, which of the 
+following quantities will be the same?
+1. Clock rate (R)
+2. CPI
+3. Execution time
+4. Number of instructions (C)
+5. MIPS
+Chapter 1.Part II 39 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Individual Exercise (12)
+• Consider the following performance measurements for a program:
+Measurement
+Instruction count
+Clock rate
+CPI
+Computer A
+10 billion
+4 GHz
+1.0
+1. Which computer has the higher MIPS rating?
+2. Which computer is faster?
+Computer B
+8 billion
+4 GHz
+1.1
+Chapter 1.Part II 40 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed. Chapter 1.Part II 41of 116
+Individual Exercise (12): Answer
+• Consider the following performance measurements for a program:
+1. Which computer has the higher MIPS rating?
+2. Which computer is faster?
+Measurement Computer A Computer B
+Instruction count 10 billion 8 billion
+Clock rate 4 GHz 4 GHz
+CPI 1.0 1.1
+4000
+10 01
+10 4
+6
+9
+= =  
+x .
+x MIPSA
+3636
+10 11
+10 4
+6
+9
+= =  
+x .
+x MIPSB
+(higher MIPS)
+s .  
+x
+x x . time CPU A
+52
+10 4
+10 10 01
+9
+9
+= =
+s .  
+x
+x x . time CPU B
+22
+10 4
+10 811
+9
+9
+= = (faster!)
+Group Exercise (13)
+• Two compilers are being tested for a 4 GHz computer with three 
+different classes of instructions: Class A, Class B, and Class C, which 
+require one, two, and three cycles, respectively
+• Both compilers are used to produce code sequence for a large piece 
+of software– The first compiler code uses 5 billion Class A instructions, 1 
+billion Class B instructions, and 1 billion Class C instructions– The second compiler code uses 10 billion Class A instructions, 1 
+billion Class B instructions, and 1 billion Class C instructions
+1. Which compiler produces the most instructions?
+2. What is the CPU clock cycles for each code sequence?
+3. What is the CPI for each code sequence?
+4. Which code sequence will be faster according to execution time?
+5. Which code sequence will be faster according to MIPS?
+6. What is the peak MIPS rating for this computer?
+Chapter 1.Part II 42 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed. Chapter 1.Part II 43of 116
+Group Exercise (13): Answer
+1. Which compiler produces the most instructions?
+Compiler 1 produces 5 + 1 + 1 = 7 billion instructions
+Compiler 2 produces 10 + 1 + 1 = 12 billion instructions   (more!)
+2. What is the CPU clock cycles for each code sequence?
+3. What is the CPI for each code sequence?
+4. Which code sequence will be faster according to execution time?
+ cycles x ))x x ( ) x ( ) x (( cycles CPU clock 9 9
+1
+10 10 10 13 12 51 = + + =
+ cycles x ))x x ( ) x ( ) x (( cycles CPU clock 9 9
+2
+10 15 10 13 12 10 1 = + + =
+s   x
+x time CPU 5.2 10 4
+10 10
+9
+9
+1
+= =
+s x
+x time CPU 75 .3  10 4
+10 15
+9
+9
+2
+ = =
+43 .1 10 7
+10 10
+ 
+  
+9
+9
+1
+1
+1
+= = = x
+x
+count n Instructio
+cycles clock CPU CPI 25 .1 10 12
+10 15
+9
+9
+2
+2
+2
+= = = x
+x
+count n Instructio
+cycles clock CPU CPI
+(faster!)
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed. Chapter 1.Part II 44of 116
+Group Exercise (13): Answer (cont.)
+5. Which code sequence will be faster according to MIPS?
+6. What is the peak MIPS rating for this computer?
+To maximize MIPS, we need to select a CPI mix that is the 
+minimum, i.e., 1, in this case
+Thus,
+2800 10 5.2
+10 7
+6
+9
+1
+= =  x
+x MIPS
+3200 10 75 .3
+10 12
+6
+9
+2
+= =  x
+x MIPS
+4000 10 1
+10 4
+10 1 6
+9
+6
+= = = = x
+x
+) x (CPI
+R MIPS eak P
+(higher MIPS rating for the slower 
+program!)
+Group Exercise (14)
+• The following measurements were made for a load-store (RISC) 
+computer that has a clock rate of 4 GHz:
+Instruction type
+ALU operations
+Loads
+Stores
+Branches
+Frequency
+43%
+21%
+12%
+24%
+CPI
+1
+2
+2
+2
+1. Assume that we build an optimized compiler for that computer 
+that discards 50% of the ALU instructions, what is the MIPS 
+ratings for the optimized code versus the unoptimized one?
+2. Does the ranking of MIPS agree with the ranking of execution 
+time?
+Chapter 1.Part II 45 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed. Chapter 1.Part II 46of 116
+Group Exercise (14): Answer
+• The following measurements were made for a load-store (RISC) computer 
+that has a clock rate of 4 GHz:
+1.Assume that we build an optimized compiler for that computer that 
+discards 50% of the ALU instructions, what is the MIPS ratings for the 
+optimized code versus the unoptimizedone?
+• Since half the ALU operations are discarded, the instruction count is 
+reduced by (0.43/2)*Cunoptimized to be 0.785*Cunoptimized. Thus:–ALU operations new frequency = 43/2/0.785 =  27%–Loads new frequency = 21/0.785 =  27%–Stores new frequency = 12/0.785 =  15%–Branches new frequency = 24/0.785 =  31%
+8. 2547 10 57 .1
+10 4
+10   6
+9
+6
+= = = x
+x
+x CPI
+R MIPS d unoptimize
+d unoptimize
+d unoptimize
+d unoptimize
+xC x x
+xC
+R
+CPIxC time CPU 9
+9
+10 3925 .0 10 4
+57 .1 − = = =
+57 .1 24 .0 2 12 .0 2 21 .0 2 43 .01 = + + + = x x x x CPI d unoptimize
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed. Chapter 1.Part II 47of 116
+Group Exercise (14): Answer (cont.)
+or
+2. Does the ranking of MIPS agree with the ranking of execution time?
+The optimized code is 3925/3395 = 1.16 faster, but its MIPS 
+rating is lower: 2312.1 versus 2547.8!
+73 .1 31 .0 2 15 .0 2 27 .0 2 27 .0 1 = + + + = x x x x CPIoptimized
+d unoptimize
+d unoptimize
+optimized
+xC x x
+xC x
+R
+CPIxC time CPU 9
+9
+10 3395 .0 10 4
+785 .0 73 .1 − = = =
+73 .1 785 .0
+24 .0 2 12 .0 2 21 .0 2 5.0 43 .0 1 = + + + = x x x x x CPIoptimized
+1. 2312 10 73 .1
+10 4
+10   6
+9
+6
+= = = x
+x
+x CPI
+R MIPSoptimized
+Group Exercise (15)
+• Suppose we have made the following measurements:– frequency of floating-point operations = 25%– CPI of floating-point operations = 4.0– CPI of non floating-point operations = 1.33– frequency of floating-point square root operations = 2%– CPI of floating-point square root operations = 20
+• There are two proposals to speedup the computer:– The first design alternative reduces the CPI of all floating-point 
+operations to 2.0– The other alternative tries to add floating-point square root 
+operations in hardware to reduce their CPI to 2 with the same 
+effort as required for the fast floating-point operations 
+• Compare these two design alternatives using the CPU performance 
+equation
+Chapter 1.Part II 48 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed. Chapter 1.Part II 49of 116
+Group Exercise (15): Answer
+•We can also compute the CPI for the improved system by subtracting the 
+cycles saved from the original CPI:
+2 ) 25 .0  4( ) 75 .0  33 .1( ) C  (1 
+= + = ==
+x x x CPI CPI n
+i fraction i original all i
+5.1 25 .0  )2 4( 2 int
+= − − = −
+x CPI po g ed floatin all improv
+64 .1 02 .0  )2 20 ( 2 int
+= − − = −
+x CPI ot square ro po g ed floatin all improv
+61 .2
+25 .0
+02 0 20 23 0 0.4
+ int
+ int
+int
+=
+× + × = =
+− − −
+− − −
+−
+root square non po floating
+root square non po floating
+po floating
+CPI
+) . ( ) . (CPI CPI
+5.1 ) 25 .0  2( ) 75 .0  33 .1( int
+= + = x x CPI g-po ed floatin all improv
+64 1 02 0 2 23 0 61 2 75 0 33 1 int
+. ) . x ( ) . x . ( ) . x . ( CPI ot square ro g-po ed floatin all improv
+= + + =
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed. Chapter 1.Part II 50of 116
+Group Exercise (15): Answer (cont.)
+• Observe that only the CPI changes
+• The proposed floating-point enhancement performs better
+improved
+original
+improved
+original
+improved CPI
+CPI
+xCxT CPI
+xCxT CPI Speedup = =
+22 1 64 1
+2
+int
+int
+. . CPI
+CPI Speedup
+ot square ro po loating improved f
+original
+ot square ro po loating improved f
+= = =
+−
+−
+33 .1 5.1
+2
+ 
+ 
+= = =
+−
+−
+oint p floating improved
+original
+oint p floating improved CPI
+CPI Speedup
+Group Exercise (16)
+• Suppose we are considering two alternatives for our conditional branch 
+instructions:– CPU A: A conditional code is set by a compare instruction and followed 
+by a branch that tests the condition code– CPU B: A compare is included in the branch– On both CPUs, the conditional branch instruction takes 2 cycles, and 
+all other instructions take 1 clock cycle– On CPU A, 20% of all instructions executed are conditional branches; 
+since every branch needs a compare, another 20% of the instructions 
+are compares– Because CPU A does not have the compare included in the branch, 
+assume that its clock cycle time is 1.25 times faster than that of CPU B
+1. Which CPU is faster?
+2. Suppose CPU A clock was only 1.1 time faster than that of CPU B, 
+which CPU is faster?
+Chapter 1.Part II 51 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Group Exercise (16): Answer
+• Suppose we are considering two alternatives for our conditional branch 
+instructions:– CPU A: A conditional code is set by a compare instruction and followed 
+by a branch that tests the condition code. – CPU B: A compare is included in the branch– On both CPUs, the conditional branch instruction takes 2 cycles, and all 
+other instructions take 1 clock cycle– On CPU A, 20% of all instructions executed are conditional branches; 
+since every branch needs a compare, another 20% of the instructions 
+are compares– Because CPU A does not have the compare included in the branch, 
+assume that its clock cycle time is 1.25 times faster than that of CPU B
+1. Which CPU is faster?
+CPIA
+=
+1
+x
+0
+.
+8
++
+2
+x
+0
+.
+20
+=
+1
+.
+2
+CPU
+time
+A
+=
+1
+.
+20
+xC
+A
+xT
+A
+• As compares are not executed on CPU B, we need to recalculate CPI
+Chapter 1.Part II 52 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed. Chapter 1.Part II 53of 116
+• Method 1:
+Method 2:
+Thus, CPU A, with shorter clock cycle time, is faster than B, which 
+executes fewer instructions.
+2. Suppose CPU A clock was only 1.1 time faster than that of CPU B, 
+which CPU is faster?
+CPU B, which executes fewer instructions, is now faster!
+Group Exercise (16): Answer (cont.)
+A B
+xC C 8.0=
+25 .0 8.0
+2.0 = =
+A
+A
+xC
+xC hes on B % of branc
+25 .1 25 .0 2 75 .0 1 = + = x x CPI B
+A A A A B
+xT xC xT x xC x time CPU 25 .1 ) 25 .1( ) 8.0( 25 .1 = =
+A A A A B
+xT xC xT x xC x time CPU 10 .1 ) 10 .1( ) 8.0( 25 .1 = =
+25 .1 8.0
+2.0 2 )2.0 8.0( 1 = + − = x x CPIB
+8.0 2.0 1 1 = − = − = count Branches ns instructio of Ratio
+75 .0 8.0
+)2.0 8.0( = − =
+A
+A
+xC
+xC B ranches on % of non-b
+Amdahl's Law in Computing
+• Used to calculate the performance gain obtained by improving some 
+portion of a computer
+• Amdahl’s Law states that:– The performance enhancement possible with a given 
+improvement is limited by the fraction of the time the improved 
+feature is used
+
+
+
+
+
+Execution 
+after impr
+time
+ovement
+=
+
+Execution 
+Execution 
+time
+unaffected
++
+affected b
+time
+y improvem
+Amount of
+improvemen
+
+ent
+t
+
+
+
+
+
+• Yields the law of diminishing returns in everyday life:– the incremental improvement in speedup gained by an 
+additional improvement in the performance of just a portion of 
+the computation diminishes as improvements are added
+Chapter 1.Part II 54 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed. Chapter 1.Part II 55of 116
+•Amdahl’s law is sometimes put in another form that yields speedup
+•Speedup:the possible overall gain by the improved execution 
+mode
+• Speedup is the measure of how a computer performs after some 
+enhancement relative to how it performed previously (always > 1)
+where speedupimprovedequals the amount of improvement
+Amdahl's Law in Computing (cont.)
+ 
+
+
+ 
+
+ = 
+
+
+ 
+
+ = nt improveme time after Execution 
+ent e improvem time befor Execution 
+nt improveme fore be e Performanc
+ovement after impr e Performanc Speedupoverall 
+ 
+
+
+
+
+
+
+
+
+
+
+
+
++
++ =
+improved
+overall
+Speedup
+ent y improvem affected b time Execution unaffected time Execution 
+ ent y improvem affected b time Execution unaffected time Execution 
+ 
+Speedup  
+  
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed. Chapter 1.Part II 56of 116
+• Lets define the fraction of the computation time in the original 
+computer that can be converted to take advantage of the 
+improvement (always < 1) as
+then
+• Speedupoveralldepends on Fractionimprovedand  Speedupimproved
+•We can also conclude that
+•Corollary:
+Amdahl's Law in Computing (cont.)
+ 
+
+
+ 
+
+ = provement before im ution time Total exec
+ent y improvem affected b time Execution Fractionimproved
+( )  
+
+
+
+
+
+ 
+
+
+
+
+
++ −
+=
+improved
+improved
+improved
+overall
+Speedup
+Fraction Fraction
+Speedup
+1
+1
+( )  
+
+
+ 
+
+ + − =
+improved
+improved
+improved old new Speedup
+Fraction Fraction x time Execution time Execution 1  
+( ) improved
+overall Fraction speedup Maximum − = 1
+1 
+Amdahl's Law in Computing (cont.)
+• Corollary: make the common case fast– The opportunity for improvement is affected by how much time 
+the event consumes. Thus, making the common case fast will 
+tend to enhance performance better than optimizing the rare case– This is a common theme in hardware design– The common case is often simpler than the rare case and hence 
+is often easier to enhance!
+• Amdahl’s law tells how much an improvement will enhance 
+performance and how to distribute resources to improve 
+cost/performance– The goal is to spend resources proportional to where time is spent
+• Amdahl’s law can also be used to compare two design alternatives
+• Common mistake in applying Amdahl’s law is to confuse– fraction of time converted to use an improvement, and– fraction of time after improvement is in use
+Chapter 1.Part II 57 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed. Chapter 1.Part II 58of 116
+Amdahl's Law in Computing (cont.)
+• The fraction of the computation time in the improved computer that is 
+spent by the improved feature is calculated as
+•Corollary: the fraction of the time spent using an enhanced feature 
+after enhancement equals the fraction of the time spent using that 
+feature before enhancement scaled by the ratio of the overall speedup 
+(achieved from enhancing that feature) to the feature speedup
+improved
+improved
+overall
+new
+old
+old
+improved
+overall
+new
+overall
+old
+improved
+old
+new
+new
+new
+new
+Fraction Speedup
+Speedup
+Fraction
+time Execution
+time Execution
+Speedup
+Speedup
+Fraction
+Speedup
+time Execution
+Speedup
+time Execution
+time Execution
+time Execution
+Fraction
+rovement after imp ution time Total exec
+t improvemen after ent y improvem affected b time Execution 
+Fraction
+improved
+improved
+improved
+improved
+improved
+improved
+improved
+×  
+
+
+ 
+
+=
+
+
+
+
+
+
+
+
+×  
+
+
+ 
+
+=
+ 
+
+
+
+
+
+ 
+
+
+
+
+
+= 
+
+
+
+
+
+
+
+=
+ 
+
+
+ 
+
+ =
+ 
+ 
+ 
+ 
+ 
+ 
+   
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed. Chapter 1.Part II 59of 116
+Amdahl's Law in Computing (cont.)
+•Assume that:–the time for class i is ti and it takes a ratio fiof the total CPU time–we reduce the time of class iby a ratio ri, so time for class iafter 
+reduction is (1-ri).ti, and therefore speedupimproved in it is 1/(1-ri) –the reduction ratio in the total CPU time is r, so total CPU time 
+after reduction is (1-r).t, and therefore Speedupoverall= 1/(1-r) 
+•Corollary:a reduction in the CPU time of one class of instructions 
+reduces the total CPU time by an amount equal to the given 
+reduction scaled by the percentage of the time taken by that class
+( ) i i
+i i
+i
+i
+i
+overall
+r f r r f
+r
+f f r Speedup × =  
+
+
+ 
+
+
+× − =
+ 
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+−
++ −
+= − = 1
+1
+1
+1 1
+1
+1
+1
+Individual Exercise (17)
+• What is the overall speedup gained by incorporating an 
+improvement that runs 10 times faster than the original 
+computer, but is only usable 40% of the time?
+Chapter 1.Part II 60 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Individual Exercise (17): Answer
+• What is the overall speedup gained by incorporating an 
+improvement that runs 10 times faster than the original 
+computer, but is only usable 40% of the time?
+
+
+
+
+Speedup
+overall
+=
+
+
+
+1
+(
+1
+−
+0
+.
+4
+)
+
+
+
+0
++
+.
+4
+10
+
+
+=
+1
+0
+.
+64
+=
+1
+.
+56
+Chapter 1.Part II 61 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Individual Exercise (18)
+• Suppose we enhance a computer to make all floating-point 
+instructions run five times faster
+1. If the execution time of some benchmark before the floating
+point enhancement is 10 seconds, what will the speedup be if 
+half of the 10 seconds is spent executing floating-point 
+instructions?
+2. How much of the execution time would floating-point 
+instructions have to account for in a benchmark that runs for 
+100 seconds with the old floating-point hardware in order to 
+yield a speedup of 3?
+3. Assuming that we enhance the computer as described above, 
+plot the speedup obtained versus the fraction of time in the 
+original benchmark spent doing floating-point operations
+Chapter 1.Part II 62 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed. Chapter 1.Part II 63of 116
+Individual Exercise (18): Answer
+• Suppose we enhance a computer to make all floating-point instructions run 
+five times faster
+1. If the execution time of some benchmark before the floating-point 
+enhancement is 10 seconds, what will the speedup be if half of the 10 
+seconds is spent executing floating-point instructions?
+2. How much of the execution time would floating-point instructions have 
+to account for in a benchmark that runs for 100 seconds with the old 
+floating-point hardware in order to yield a speedup of 3?
+or 83% of the execution time
+67 .1 6.0
+1
+5
+5.0 )5.0 1(
+1 = =
+ 
+
+
+
+
+ 
+
+
+
+
++ −
+= Speedupoverall
+s t t t
+ Speedupoverall
+ 33 . 83
+5 ) 100 (
+100 3 =
+ 
+
+
+
+
+ 
+
+
+
+
++ −
+= =
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed. Chapter 1.Part II 64of 116
+Individual Exercise (18): Answer (cont.)
+3. Assuming that we enhance the computer as described above, plot the 
+speedup obtained versus the fraction of time in the original 
+benchmark spent doing floating-point operations
+f f f
+ Speedupoverall × − =
+ 
+
+
+
+
+ 
+
+
+
+
++ −
+= 8.0 1
+1
+5 ) 1(
+1
+2.50
+5.00
+1.67
+1.25 1.00
+0.00
+1.00
+2.00
+3.00
+4.00
+5.00
+0 0.25 0.5 0.75 1
+Fraction of time spent doing floating-point 
+operations in the original benchmark
+Speedup
+Individual Exercise (19)
+• Suppose a program runs in 100 seconds on a computer, 
+with multiply operations responsible for 80 seconds of 
+this time
+1. How much do I have to improve the speed of 
+multiplication, if I want the program to run 4 times 
+faster?
+2. How about making it 5 times faster?
+Chapter 1.Part II 65 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed. Chapter 1.Part II 66of 116
+Individual Exercise (19): Answer
+• Suppose a program runs in 100 seconds on a computer, with multiply 
+responsible for 80 seconds of this time
+1. How much do I have to improve the speed of multiplication, if I want 
+the program to run 4 times faster?
+Fractionimproved= 0.8
+2. How about making it 5 times faster?
+That is, there is no amount by which we can enhance multiply to achieve 
+fivefold increase in performance, if multiply account for only 80% of the 
+workload!
+( ) 16 8.0 8.0 1
+1 4 = 
+
+
+
+
+
+
+
+
+
+
+
+
++ −
+= = improved
+improved
+overall
+Speedup
+Speedup
+Speedup
+( ) ∞= 
+
+
+
+
+
+
+
+
+
+
+
+
++ −
+= = improved
+improved
+overall
+Speedup
+Speedup
+Speedup 8.0 8.0 1
+1 5
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed. Chapter 1.Part II 67of 116
+•There is a key advantage for using the CPU performance 
+equation versus Amdahl’s law:–it is often possible to measure the constituent parts 
+of the CPU performance equation–it may be difficult to measure things such as the 
+fraction of execution time for which a set of 
+instructions is responsible
+•To calculate the fraction of execution time for which a 
+class of instructions is responsible:
+Amdahl's Law in Computing (cont.)
+T C CPI i class for time CPU i i
+× × =
+i fraction
+i i i C CPI
+CPI
+T C CPI
+T C CPI
+time CPU Total
+i class for time CPU i class for time CPU of Percentage × = × ×
+× × = =
+Group Exercise (20)
+• Repeat Exercise 15, using Amdahl’s Law
+• Suppose we have made the following measurements:– frequency of floating-point operations = 25%– CPI of floating-point operations = 4.0– CPI of non floating-point operations = 1.33– frequency of floating-point square root operations = 2%– CPI of floating-point square root operations = 20
+• There are two proposals to speedup the computer:– The first design alternative reduces the CPI of all floating-point 
+operations to 2.0– The other alternative tries to add floating-point square root 
+operations in hardware to reduce their CPI to 2 with the same 
+effort as required for the fast floating-point operations 
+• Compare these two design alternatives using the Amdahl’s Law 
+Chapter 1.Part II 68 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed. Chapter 1.Part II 69of 116
+Group Exercise (20): Answer
+• The percentage of execution time for which floating-point (fp) 
+instructions is responsible =
+• The percentage of execution time for which floating-point square 
+root instructions is responsible =
+22 .1 82 .0
+1
+10
+2.0 )2.0 1(
+1
+p
+= =
+ 
+
+
+
+
+ 
+
+
+
+
++ −
+= overall ot square ro f
+Speedup
+33 .1 75 .0
+1
+2
+5.0 )5.0 1(
+1
+p
+= =
+ 
+
+
+
+
+ 
+
+
+
+
++ −
+= overall f
+Speedup
+%50 25 .0 2
+4 = × = ×
+i fraction
+pf C CPI
+CPI
+%20 02 .0 2
+20 = × = ×
+i fraction
+root  square pf C CPI
+CPI
+2 2
+4 = = =
+enhanced
+original
+fp CPI
+CPI speedup 10 2
+20 = = =
+enhanced
+original
+root square fp CPI
+CPI speedup
+(This enhancement is better!)
+2 ) 25 .0 4( ) 75 .0 33 .1( ) (1
+= + = ==
+ x  x C x CPI CPI n
+i fraction i original i
+The Power Wall
+Chapter 1.Part II 70 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+The Power Wall (cont.)
+Chapter 1.Part II 71 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+The Power Wall (cont.)
+• Clock rate and power increased rapidly for decades, then flattened off 
+lately
+• The reason they grew together is that they are correlated
+• The reason for their recent slowing is that we have run into the 
+practical power limit for cooling commodity microprocessors
+• Pentium 4 made a big jump in clock rate and power but less in 
+performance
+• Pentium 4 thermal problems led to the abandonment of the Pentium 
+4 line
+• Core 2 line reverts to a simpler pipeline with lower clock rates and 
+multiple processor per chip
+Chapter 1.Part II 72 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+The Power Wall (cont.)
+• The dominant technology for ICs is called CMOS (complementary 
+metal oxide semiconductor)
+• For CMOS, the primary source of power dissipation is dynamic 
+power
+• Dynamic power is the power that is consumed during switching
+• The dynamic power dissipation depends on the capacitive loading 
+of each transistor, the voltage applied, and the frequency that the 
+transistor is switched:
+Power
+=
+Capacitive
+load
+x
+Voltage
+2
+x
+Frequency 
+switched
+• Capacitive load per transistor is a function of both – the number of transistors connected to an output (fanout) and – the technology, which determines the capacitance of both wires 
+and transistors
+• Frequency switched is a function of the clock rate
+Chapter 1.Part II 73 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Individual Exercise (21)
+• Suppose we developed a new, simpler processor that 
+has 85% of the capacitive load of the more complex 
+older processor
+• Further, assume that it has adjustable voltage so that it 
+can reduce voltage 15% compared to the older 
+processor, which results in a 15% shrink in frequency
+• What is the impact on dynamic power?
+Chapter 1.Part II 74 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Individual Exercise (21): Answer
+• Suppose we developed a new, simpler processor that 
+has 85% of the capacitive load of the more complex 
+older processor
+• Further, assume that it has adjustable voltage so that it 
+can reduce voltage 15% compared to the older 
+processor, which results in a 15% shrink in frequency
+• What is the impact on dynamic power?
+Power
+new
+Power
+=
+(0.85
+∗
+Capacitive
+load)
+Capacitive
+x
+(0.85
+load
+x
+∗
+Voltage)
+Voltage
+2
+x
+2
+x
+(0.85
+∗
+Frequency 
+Frequency 
+old
+switched
+switched)
+• Hence, the new processor uses about half the power of 
+the old processor
+=
+0
+.
+52
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Chapter 1.Part II 75 of 116
+Group Exercise (22)
+• From the chart in the “Power Wall” slide, calculate the growth 
+factor of each of the followings over the period 1982-2007
+1. clock rates
+2. power
+• Explain how could clock rates and power grow by different factors
+• Hint: Voltage change over the period 1982-2007 is shown below
+0 
+1 
+2 
+3 
+4 
+5 
+6
+Voltage (Volt)
+5 5 5 5
+3.3
+80286
+(1982)
+80386
+(1985)
+80486
+(1989)
+Pentium
+(1993)
+Pentium
+Pro (1997)
+1.75
+Pentium 4
+Willamette
+(2001)
+1.25
+Pentium 4
+Prescott
+(2004)
+1.1
+Core 2
+Ketsfield
+(2007)
+Chapter 1.Part II 76 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Group Exercise (22): Answer
+1982-2004
+Clock rates
+1982-2007
+3600/12.5 = 288 2667/12.5 = 213.36
+Power
+Voltage
+103/3.3 = 31.21
+1.25/5 = 0.25
+95/3.3 = 28.79
+1.1/5 = 0.22
+• Power can be reduced by lowering the voltage, which occurred with 
+each new generation of technology, and power is a function of the 
+voltage squared
+• Typically, the voltage was reduced about 15% per generation
+• Over the period 1982-2007, voltage has gone from 5V to 1V, which 
+is why the increase in power is only 30 times
+Chapter 1.Part II 77 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+The Power Wall (cont.)
+• Although dynamic power is the primary source of power dissipation 
+in CMOS, static power dissipation occurs because of leakage 
+current that flows even when a transistor is off
+• Leakage is responsible for 40% of the power consumption in 2008
+• Thus, increasing the number of transistors increases power 
+dissipation, even if the transistors are always off
+• The problem today is that further lowering of the voltage appears to 
+make the transistors too leaky
+• To try to address the power problem designers– have already attached large devices (that could be too expensive 
+for desktop computers) to increase cooling– turn off parts of the chip that are not used in a given clock cycle
+• A variety of design techniques and technology innovations are being 
+deployed to control leakage
+• But, it is hard to lower voltage further
+Chapter 1.Part II 78 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Individual Exercise (23)
+• Calculate the dynamic energy consumed by a program 
+when executed on a multicore microprocessor
+• Assume that– the program instructions are equally divided between 
+the cores– the average CPI calculated for every core is the same
+Chapter 1.Part II 79 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed. Chapter 1.Part II 80of 116
+• All cores run same number of instructions and have the same CPI–all cores take the same amount of time–the program execution time equals the core execution time
+• In this case, the dynamic energy consumed by the program is 
+independent from the clock frequency and the number of cores
+Individual Exercise (23): Answer
+C CPI  Voltage  load Capacitive  Energy
+n Frequency Clock
+n
+C CPI
+ Frequency Clock  Voltage  load Capacitive  Energy
+Frequency Clock
+n
+C CPI
+Frequency Clock
+C CPI Time CPU Time CPU
+n Time CPU Power  Energy
+Frequency Clock  Voltage  load Capacitive  Power
+core
+2
+dynamic
+core 2
+dynamic
+core
+core core
+core program
+program dynamic dynamic
+2
+dynamic
+× × × =
+×
+×
+× × × =
+×
+= × = =
+× × =
+× × =
+n is the number of cores
+The Switch from Uniprocessors to Multiprocessors
+• Prior to the mid-1980’s, processor performance growth was largely 
+technology-driven and averaged about 25% per year
+• The increase in growth to about 52% since then is attributable to 
+more advanced architectural and organizational ideas
+• Since 2002, the performance growth has slowed to less than a 
+factor of 20% per year, due to the limits of power, available 
+instruction-level parallelism, and long memory latency
+Chapter 1.Part II 81 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+The Switch from Uniprocessors to Multiprocessors (cont.)
+• Power has replaced die area as the most critical resource of 
+microprocessor design
+• The power limit has forced a dramatic change in the design of 
+microprocessors
+• Computer designers chose a different way from the way they designed 
+microrprocessors for their first 30 years
+• Conserving power while trying to increase performance has forced the 
+hardware industry to switch to multicore microprocessors, thereby forcing 
+the software industry to switch to programming parallel hardware
+• A multicore microprocessor: A microprocessor containing multiple 
+processors (cores) in a single integrated circuit– a processor is referred to as a core– a microprocessor is referred to as a multicore microprocessor– e.g., a quadcore microprocessor chip contains 4 processors (or cores)
+• As of 2006, all microprocessors have multiple processors per chip
+• The official plan of record for many companies is to double the number of 
+cores per microprocessor per semiconductor technology generation, 
+which is about every two years
+Chapter 1.Part II 82 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+The Switch from Uniprocessors to Multiprocessors (cont.)
+• The benefit of switching to multicore microprocessors is often on 
+throughput rather than on response time
+• To get significant improvement in response time, programmers 
+need to rewrite their programs to take advantage of multiple cores
+• In the past, programmers could rely on innovations in hardware, 
+architecture, and compilers to double performance of their 
+programs every 18 months without having to change a line of code
+• Today, for programmers to get their significant improvement in 
+response time, they need to rewrite their programs to take 
+advantage of multiple processors
+• Moreover, to get benefit of running faster on new microprocessors, 
+programmers will have to continue to improve performance of their 
+code as the number of cores doubles
+Chapter 1.Part II 83 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+The Switch from Uniprocessors to Multiprocessors (cont.)
+• Why has it been so hard for programmers to write explicitly 
+parallel programs?– Parallel programming is by definition performance programming, 
+which increases the difficulty of programming– Fast for parallel hardware means that the programmer must 
+divide an application so that each processor has roughly the same 
+amount to do at the same time, and that overhead of scheduling 
+and coordination does not take away the potential performance 
+benefits of parallelism
+• Challenges include:– Scheduling– Load balancing– Time for synchronization– Overhead (routing time) for communication between parties
+• Execution time in a multicore system can be split into:– Computing time spent executing the program lines of code and– Routing time spent sending data from one core to another
+Chapter 1.Part II 84 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Individual Exercise (24)
+• If 20% of a program execution time is sequential, what 
+is the speedup achieved on a 4-core microprocessor?
+Chapter 1.Part II 85 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Individual Exercise (24): Answer
+• If 20% of a program execution time is sequential, what is the 
+speedup achieved on a 4-core microprocessor?
+• Sequential part (S) = 0.2
+• Parallel (improved) part (P) =1 – S = 0.8
+• The parallel part can be divided among cores
+• The sequential part cannot be parallelized (divided among cores)
+• Speedupparallel = no. of cores = 4
+
+
+
+
+Speedup
+overall
+=
+
+
+
+1
+(
+1
+−
+0
+.
+8
+)
+0
+4 
+8.
++
+
+
+
+
+
+=
+0 
+1
+.
+4
+=
+2
+.
+5
+Chapter 1.Part II 86 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Group Exercise (25)
+• The following data was collected from running a 
+program on a 4-core, 4-GHz processor
+Instruction type
+ALU operations
+Loads
+Stores
+Branches
+CPI Frequency Sequential portion
+1
+3
+2
+2
+40%
+20%
+15%
+25%
+5%
+14%
+12%
+81%– What is the speedup gained by running the program 
+on a 4-core processor?
+Chapter 1.Part II 87 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed. Chapter 1.Part II 88of 116
+Group Exercise (25): Answer
+• Sequential part (S) = 0.3028 Parallel (improved) part (P) =1 –S = 0.6972
+• The parallel part can be divided among cores
+• The sequential part cannot be parallelized (divided among cores)
+• Speedupparallel= no. of cores = 4
+Instruction 
+type CPI Frequency Time fraction Sequential 
+portion
+Sequential time 
+fraction
+ALU operations 1 40% 1/1.80×0.40 = 22.22% 5% 22.22×0.05 = 1.11%
+Loads 3 20% 3/1.80×0.20 = 33.33% 14% 33.33×0.14 = 4.67%
+Stores 2 15% 2/1.80×0.15 = 16.67% 12% 16.67×0.12 = 2.00%
+Branches 2 25% 2/1.80×0.25 = 27.78% 81% 27.78×0.81 = 22.50%
+Total 100% 30.28%
+( ) 
+=
+= × + × + × + × = × = 4
+1
+80 .1 25 .0 2 15 .0 2 20 .0 3 40 .0 1
+i
+fraction i
+C CPI CPI
+2.096
+4
+6972 .0 ) 6972 .0 1(
+1 Speedupoverall
+=
+ 
+
+
+
+
+ 
+
+
+
+
++ −
+=
+Practical Steps to Evaluate Performance
+• Step 1: Measuring– Agree on whether we are measuring response time or 
+throughput– Select a set of suitable benchmarks and obtain performance 
+measurements
+• Step 2: Reporting– Write a report
+• Steps 3 and 4: Comparing and summarizing– More convenient to have a single number to compare 
+performance– Summarizing a set of measurements results in less information
+Chapter 1.Part II 89 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Measuring Performance Using Benchmarks
+• A computer user who runs the same program day in and day out would be 
+the perfect candidate to evaluate a new computer
+• There are two ways to measure performance of computer systems:– use programs typical of expected workload:
+• the mixture of programs and OS commands that users run on a 
+computer most of the time
+• is either the actual collection of applications run by a user or 
+constructed from real programs to approximate such a mix
+• specifies both the programs and the relative frequencies– using benchmarks:
+• programs specifically chosen to measure performance of expected 
+class of applications
+• Hopefully, predict the performance of the actual workload
+• There are four levels of benchmarks (in order of decreasing accuracy):– real programs – kernels (small benchmarks)– toy benchmarks (small benchmarks)– synthetic benchmarks
+Chapter 1.Part II 90 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Measuring Performance Using SPEC
+• SPEC: S
+tandard P
+erformance E
+• http://www.spec.org/
+• Created in 1988
+valuation C
+orporation
+• Offers a dozen different benchmark sets designed to test a wide 
+variety of computing environments using real applications and 
+strictly specified execution rules and reporting requirements
+• Companies have agreed on a set of real programs and inputs
+• SPEC is as good as the constituent individual benchmarks
+• The weakness of any one benchmark is lessened by the presence of 
+other benchmarks
+• SPEC benchmark sets include benchmarks for CPU performance, 
+power, graphics, high-performance computing, object-oriented 
+computing, Java applications, client-server models, mail systems, 
+file systems, and web servers
+• SPEC requires that benchmarks be run on real hardware
+Chapter 1.Part II 91 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Home Exercise (26)
+• Visit the SPEC web site
+• For each provided benchmark suite, list its name, latest 
+release year, and usage
+• Put your answers in a table form
+Chapter 1.Part II 92 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Measuring Performance Using SPEC CPU2006
+• CPU2006: compares compute-intensive workloads, containing two suites:– CINT2006 for compute-intensive integer performance (12 programs)– CFP2006 for compute-intensive floating-point performance  (17 programs)
+• A set of standard CPU-intensive, integer and floating-point 
+benchmarks based on real programs
+• Separate summaries are reported for the integer and floating-point 
+benchmark sets
+• Valuable indicator of architecture, compiler technology, and memory 
+system performance
+• Computers tested using SPEC have aggressive memory systems and 
+compilers. Most delivered similar systems have lower performance
+Chapter 1.Part II 93 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Measuring Performance Using SPEC CPU2006 (cont.)
+• Use wall clock time as the reported measurement, but because 
+there is little I/O, they measure CPU performance
+• Execution time measurements are first normalized by dividing the 
+execution time on a Sun Ultra Enterprise 2 with a 296 MHz 
+UltraSPARC II processor, introduced in 1997 (reference 
+computer) by the execution time on the measured computer
+• This normalization yields a measure, called SPEC ratio
+e computer
+SPEC ratio
+time on th
+benchmark 
+ program i
+=
+time on th
+e referenc
+e measured
+• The SPEC ratio is the inverse of execution time
+ computer
+• Bigger numeric SPEC ratio indicates faster performance
+benchmark 
+ program i
+• A measurement summary is obtained by taking the geometric mean 
+of the SPEC ratios obtained for each benchmark suite
+Chapter 1.Part II 94 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Summarizing Performance Using Total Execution Time
+• If Timei is the execution time for the ith
+program of a total of n in the 
+benchmark, to summarize and compare performance:– Use total execution time (Total) of the benchmark programs
+Total
+= =
+n
+i
+
+1
+(
+Time
+i
+)– Use the arithmetic mean (AM) of execution times
+1
+AM
+=
+n
+
+i
+=
+n
+1
+(
+Time
+i
+)
+• Total execution time provides a consistent performance summary
+• If programs run an equal number of times, above metrics are 
+directly proportional to (track) the execution time
+• AM should not be used to average normalized execution times, 
+otherwise the results would vary depending on the computer we 
+choose as the reference (see Exercise 29!)
+Chapter 1.Part II 95 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed. Chapter 1.Part II 96of 116
+Summarizing Performance Using Harmonic Mean
+•When performance is expressed as a rate, such as MFLOPS, the 
+average that tracks total execution time is harmonic mean (HM)
+• If Timei is the execution time for the ithfor n workload programs
+where                           (usually f is just a constant)
+•HM of a set of rates tracks execution time
+•HM is the inverse of the AM of the corresponding execution times
+• If ais a constant, then
+
+=
+=
+n
+i i
+Rate
+n HM
+1
+1
+AM
+a
+Time n
+a
+n
+Time
+a
+Time
+nxa
+Rate
+n HM n
+i
+i
+n
+i
+i
+n
+i
+i
+n
+i i
+= = = = =
+   
+= = = = 1 1 1 1
+1
+  
+1
+ 
+
+
+ 
+
+ =
+i
+i Time f Rate 1
+Summarizing Performance Using Weighted Execution Time
+• If programs do not run an equal number of times, we could assign a 
+weighting factor wi to each one to indicate the relative frequency of 
+the program in the workload
+• This gives a clear picture of the workload performance
+• One method of weighting programs is to choose weights so that 
+each program execution time is equal on the reference computer
+• For a set of n programs each taking Timei time on 
+one computer, the equal-time weights wi on that 
+computer are:
+• The weighted arithmetic mean (WAM)
+is obtained by summing the products of 
+w
+i
+WAM
+weighting factors and execution times:
+• The weighted harmonic mean (WHM)
+of rates gives the same relative performance
+as WAM of execution times:
+=
+= =
+n
+i
+1
+Time
+i
+
+1
+(
+
+j
+w
+= 
+n
+1
+1
+Time
+i 
+xTime
+i
+WHM
+=
+1
+
+i
+= 
+n
+1
+w
+j
+)
+i
+Rate
+i
+Chapter 1.Part II 97 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Home Exercise (27)
+• For a set of n programs each taking Timei time on one 
+computer, prove that the equal-time weights wi on that 
+computer are:
+w
+i
+=
+1
+Time
+i
+
+j
+= 
+n
+1
+1
+Time
+j
+Chapter 1.Part II 98 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Individual Exercise (28)
+• On a computer, program 1 takes 10 s and program 2 takes 40 s
+1. Determine a weighting that generates equal execution time for 
+each program on that computer, using the equal-time weights 
+formula
+2. Determine a weighting that generates equal execution time for 
+each program on that computer, without using the equal-time 
+weights formula
+Chapter 1.Part II 99 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed. Chapter 1.Part II 100of 116
+Individual Exercise (28): Answer
+• On a computer, program 1 takes 10 s and program 2 takes 40 s
+1. Determine a weighting that generates equal execution time for 
+each program on that computer, using the equal-time weights 
+formula
+Time1= 10 and Time2= 40
+2. Determine a weighting that generates equal execution time for 
+each program on that computer, without using the equal-time 
+weights formula
+w1= 4 and w2= 1
+w1= 1 and w2= 0.25
+8.0
+40
+1
+10
+1 10
+1
+1
+1
+2
+1
+1
+1
+=
+ 
+  
+ + ×
+= =
+
+=j j
+Time Time
+w 2.0
+40
+1
+10
+1 40
+1
+1
+1
+2
+1
+2
+2
+=
+ 
+  
+ + ×
+= =
+
+=j j
+Time Time
+w
+Summarizing Performance Using Normalized Execution Time
+• A second approach to unequal mixture of programs in the workload is 
+to normalize execution times to a reference computer and then take 
+the average of the normalized execution times
+Execution 
+time ratio
+=
+execution 
+execution 
+time on th
+time on th
+e measured
+e referenc
+ computer
+e computer
+• Average normalized execution time can be expressed as either an 
+arithmetic or geometric mean (GM)
+=
+n
+GM ∏
+n
+i
+=1
+Execution
+time
+ratio
+i
+where Execution time ratioi is the execution time, normalized to the 
+reference computer for the ith
+program of a total n in the benchmark
+• Normalization in SPEC ratios is done in the opposite way: 
+execution times are normalized by dividing the execution time on the 
+reference computer by the execution time on the measured computer
+Chapter 1.Part II 101 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Summarizing Performance Using Geometric Mean
+• Normalized results should be combined with geometric mean (GM)
+• GM is independent of which data series we use for normalization
+• GM gives the same relative answer no matter what computer is used 
+to normalize the results
+• This is because GM has the property that taking either the ratio of the 
+means or the means of the ratios produces the same results, i.e.
+Geometric
+Geometric
+mean
+mean
+(
+X
+(
+Y
+i
+i
+)
+)
+=
+Geometric
+mean
+(
+Y 
+X
+i
+i
+)
+• However, it does not track total execution time and thus cannot be 
+used to predict relative execution time for a workload
+• Unfortunately, GM gives equal weight to all programs in the summary
+• Thus, it encourages designers to focus on benchmarks that are easier 
+to improve rather than on the benchmarks that are slower
+• As a point of interest, the relationship between the means of the 
+same set of numbers is always:
+HM
+≤
+GM
+≤
+AM
+Chapter 1.Part II 102 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Group Exercise (29)
+• On computer A, program 1 takes 1 s and program 2 takes 1000 s
+• On computer B, program 1 takes 10 s and program 2 takes 100 s
+1. Which computer is faster based on individual program 
+comparison?
+2. Which computer is faster based on total execution time?
+3. Which computer is faster based on execution time arithmetic 
+mean?
+4. Which computer is faster based on execution time geometric 
+mean?
+5. Which computer is faster based on normalized execution time 
+arithmetic mean? Use computer A as a reference computer?
+6. Which computer is faster based on normalized execution time 
+arithmetic mean? Use computer B as a reference computer?
+Chapter 1.Part II 103 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Group Exercise (29) (cont.)
+7. Which computer is faster based on normalized execution time 
+geometric mean? Use computer A as a reference computer?
+8. Which computer is faster based on normalized execution time 
+geometric mean? Use computer B as a reference computer?
+9. Determine a weighting that generates equal execution time for 
+each program on computer A
+10.Determine a weighting that generates equal execution time for 
+each program on computer B
+11.Which computer is faster based on execution time weighted 
+arithmetic mean, if we assume a weighting that generates 
+equal execution time for each program on computer A?
+12.Which computer is faster based on execution time weighted 
+arithmetic mean, if we assume a weighting that generates 
+equal execution time for each program on computer B?
+Chapter 1.Part II 104 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed. Chapter 1.Part II 105of 116
+Group Exercise (29): Answer
+• On computer A, program 1 takes 1 s and program 2 takes 1000 s
+• On computer B, program 1 takes 10 s and program 2 takes 100 s
+Time 
+on A
+Time 
+on B
+Normalized to A Normalized to B
+A B A B
+Program 1 1 10 1 10 0.1 1
+Program 2 1000 100 1 0.1 10 1
+Total time 1001 110 2 10.1 10.1 2
+Arithmetic mean of 
+time or normalized 
+time
+500.5 55 1 5.05 5.05 1
+Geometric mean of 
+time or normalized 
+time
+31.6 31.6 1 1 1 1
+Group Exercise (29): Answer (cont.)
+1. Which computer is faster based on individual program comparison?
+10 =
+10
+A is                 times faster than B for program 1
+1
+1000 =
+10
+B is                 times faster than A for program 2
+100
+2. Which computer is faster based on total execution time?
+B is                               
+1
++
+10
+1000
++
+100
+=
+1001
+110
+=
+9
+.
+1
+times faster than A
+Chapter 1.Part II 106 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed. Chapter 1.Part II 107of 116
+Group Exercise (29): Answer (cont.)
+3. Which computer is faster based on execution time arithmetic mean?
+B is                                          times faster than A
+4. Which computer is faster based on execution time geometric mean?
+both computers are of the same speed!
+5. Which computer is faster based on normalized execution time arithmetic 
+mean? Use computer A as a reference computer?
+A is                                             times faster than B
+1.9
+) 110 (2
+1
+) 1001 (2
+1
+) 100 10 (2
+1
+) 1000 1( 2
+1
+= =
++
++
+0.1 100 10
+1000 1
+2
+2
+= x
+x
+05 .5
+)2(2
+1
+)1. 10 (2
+1
+1000
+1000
+1
+1
+2
+1
+1000
+100
+1
+10
+2
+1
+= =
+ 
+  
+ +
+ 
+  
+ +
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed. Chapter 1.Part II 108of 116
+Group Exercise (29): Answer (cont.)
+6. Which computer is faster based on normalized execution time 
+arithmetic mean? Use computer B as a reference computer?
+B is                                             times faster than A
+Clearly, both of the above results cannot be correct! This arises from 
+using the AM of ratios!
+7. Which computer is faster based on normalized execution time 
+geometric mean? Use computer A as a reference computer?
+both computers are of the same speed!
+05 .5
+)2(2
+1
+)1. 10 (2
+1
+100
+100
+10
+10
+2
+1
+100
+1000
+10
+1
+2
+1
+= =
+ 
+  
+ +
+ 
+  
+ +
+0.1
+1000
+100
+1
+10
+1000
+1000
+1
+1
+2
+2
+=
+x
+x
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed. Chapter 1.Part II 109of 116
+Group Exercise (29): Answer (cont.)
+8. Which computer is faster based on normalized execution time 
+geometric mean? Use computer B as a reference computer?
+both computers are of the same speed!
+9. Determine a weighting that generates equal execution time for each 
+program on computer A
+10.Determine a weighting that generates equal execution time for each 
+program on computer B
+0.1
+100
+100
+10
+10
+100
+1000
+10
+1
+2
+2
+=
+x
+x
+999 .0 001 .1
+1
+) 1000
+1
+1
+1 (  1
+1
+1
+= =
++
+=
+x
+w 001 .0 1001
+1
+) 1000
+1
+1
+1 (  1000
+1
+2
+= =
++
+=
+x
+w
+909 .0 1.1
+1
+) 100
+1
+10
+1 ( 0 1
+1
+1
+= =
++
+=
+x
+w 091 .0 11
+1
+) 100
+1
+10
+1 (  100
+1
+2
+= =
++
+=
+x
+w
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed. Chapter 1.Part II 110of 116
+Group Exercise (29): Answer (cont.)
+11.Which computer is faster based on execution time weighted arithmetic 
+mean, if we assume a weighting that generates equal execution time 
+for each program on computer A?
+A is                                                  times faster than B
+12.Which computer is faster based on execution time weighted arithmetic 
+mean, if we assume a weighting that generates equal execution time 
+for each program on computer B?
+B is                                                   times faster than A
+This weighting always makes the base computer faster!
+05 .5 ) 19 . 18 (
+) 91 . 91 (
+) 100 091 .0 10 909 .0(
+) 1000 091 .0 1 909 .0( = = +
++
+x x
+x x
+05 .5 ) 999 .1(
+) 09 . 10 (
+) 1000 001 .0 1 999 .0(
+) 100 001 .0 10 999 .0( = = +
++
+x x
+x x
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed. Chapter 1.Part II 111of 116
+SPEC CPU95 Case Study
+Clock rate (MHz)
+SPECint
+2
+0
+4
+6
+8
+3
+1
+5
+7
+9
+10
+200 250 150 100 50
+Pentium
+Pentium Pro
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed. Chapter 1.Part II 112of 116
+SPEC CPU95 Case Study (cont.)
+Pentium Clock rate (MHz)
+SPECfp
+Pentium Pro
+2
+0
+4
+6
+8
+3
+1
+5
+7
+9
+10
+200 250 150 100 50
+SPEC CPU95 Case Study (cont.)
+• At the same clock rate:– Pentium Pro is 1.4 to 1.5 times faster on SPECint95– Pentium Pro is 1.7 to 1.8  times faster on SPECfp95
+• Pentium Pro with a slower clock rate has a better performance!
+• Pentium Pro performance scales better with increases in clock rate– Increasing clock rate from 150 to 200 MHz on SPECfp95:
+• Pentium Pro shows an improvement of 1.24
+• Pentium shows a smaller improvement of 1.18
+• For both processors, increasing the clock rate by a certain 
+factor increases performance by a lower factor (Amdahl’s law!)– Doubling Pentium Pro clock rate from 100 to 200 MHz:
+• SPECint95 performance improves by only 1.7
+• SPECfp95 performance improves by only 1.4– The reason for this is performance loss in the memory system– Since the speed of the main memory is not increased, increasing 
+processor speed increases the bottleneck at the memory system 
+• Improvement sources are organization and compiler enhancements
+Chapter 1.Part II 113 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+SPEC CPU2000 Case Study
+Chapter 1.Part II 114 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+SPEC CPU2000 Case Study (cont.)
+• The performance of each of these processors scales almost linearly 
+with clock rate increases– This should not be the case, since losses in the memory system 
+often worsen with higher clock rates– The strong shown performance is due to:
+• The aggressive cache systems used on both processors
+• The inability of many of the SPEC benchmarks to stress such 
+a memory system
+• Pentium 4 is relatively better than Pentium III on floating-point 
+benchmarks
+• Pentium 4 is relatively worse than Pentium III on integer 
+benchmarks
+• Pentium 4 provides a set of new instructions that provide a 
+significant boost for floating-point
+Chapter 1.Part II 115 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.
+Fallacies and Pitfalls
+• Pitfall: expecting the improvement of one aspect of a 
+computer to increase overall performance by an amount 
+proportional to the size of the improvement
+• Fallacy: computers at low utilization use little power
+• Pitfall: using a subset of the performance equation as a 
+performance metric
+Chapter 1.Part II 116 of 116
+Patterson and Hennessy’s Computer Organization and Design, 5th Ed.

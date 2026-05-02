@@ -1,0 +1,51 @@
+Long Answer Questions
+
+Explain the primary limitation of the single cycle design regarding datapath resource usage.
+
+Describe the observations made about the op field, rs field, and rt field across different MIPS instruction formats.
+
+Detail the components, inputs, and outputs of the ALU control unit.
+
+Describe the inputs and the various categories of outputs of the Main Control Unit.
+
+Explain how the target address for a Jump instruction is calculated and concatenated.
+
+Discuss the advantages and disadvantages of a single cycle implementation.
+
+Explain the performance equation and how pipelining affects it.
+
+Detail the specific operations that occur in each of the five stages of a pipelined load instruction.
+
+Compare the clock cycle timing of a single cycle implementation versus a pipeline implementation for executing multiple instructions.
+
+What specific characteristics of the MIPS Instruction Set Architecture make it easy to pipeline?
+
+Explain the purpose and placement of state registers in a MIPS pipelined datapath.
+
+How are pipeline control signals managed, generated, and passed through the different stages of the pipeline?
+
+Describe the three main categories of pipeline hazards and provide a brief description for each.
+
+Explain how a single memory for both instructions and data would create a structural hazard in a pipelined processor.
+
+Detail the hardware modification needed to resolve the structural hazard caused by a single memory.
+
+Explain the register file access hazard and how modifying the register read and write halves of the clock cycle helps fix it.
+
+Describe a read before write data hazard and explain why dependencies backward in time cause it.
+
+Describe a load-use data hazard and explain why it causes a delay in the pipeline execution.
+
+What causes a control hazard in a pipelined processor, and which types of instructions typically trigger them?
+
+Discuss the impact of unbalanced pipeline stages on the pipeline rate and efficiency of a processor.
+
+Explain why pipelining improves the throughput of an entire workload but does not improve the execution time of an individual instruction.
+
+How does inserting NOP instructions solve data hazards in a pipelined processor?
+
+Discuss the difference in calculating the clock cycle time for a single cycle processor versus a multi-cycle pipelined processor based on stage latencies.
+
+Explain the concept of filling and draining the pipeline and how it impacts the overall speedup for short code runs.
+
+Detail how a graphical representation of a MIPS pipeline helps designers analyze the execution of code over multiple clock cycles.

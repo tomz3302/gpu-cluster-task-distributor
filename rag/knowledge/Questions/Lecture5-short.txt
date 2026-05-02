@@ -1,0 +1,51 @@
+Short Answer Questions
+
+What is the main characteristic of a single cycle design regarding instruction execution?
+
+What determines the cycle time in a single cycle datapath?
+
+Which bit field contains the op field in a MIPS instruction?
+
+Which two bit fields specify the registers to be read in an R-type instruction?
+
+What is the length of the offset field for beq, lw, and sw instructions?
+
+How many bits are in the output control lines of the main control unit?
+
+Which instruction field is used to generate the ALU control lines along with the ALUOp?
+
+What is the primary input to the Main Control Unit?
+
+What type of digital logic design method is used to implement the control units?
+
+How is the target address for a jump instruction formed?
+
+Which MIPS instruction typically has the longest critical path?
+
+Why does a single cycle implementation use the clock cycle inefficiently?
+
+What is the primary advantage of processor pipelining?
+
+Name the five stages of a load instruction in a pipelined processor.
+
+Does pipelining reduce the latency of a single instruction?
+
+In pipelining, what are the registers placed between pipeline stages called?
+
+During which pipeline stage are all control signals determined?
+
+What type of hazard occurs when two different instructions attempt to use the same resource at the same time?
+
+What type of hazard occurs when an instruction attempts to use data before it is ready?
+
+What type of hazard involves making a decision about program control flow before the condition is evaluated?
+
+How can a structural hazard related to memory access be fixed?
+
+How is a register file access hazard typically fixed using clock edges?
+
+What type of data hazard is caused by a load instruction followed directly by an instruction that needs its result?
+
+How can pipeline hazards usually be resolved if the control unit detects them?
+
+What is the ideal potential speedup CPI for a fully utilized pipelined processor?

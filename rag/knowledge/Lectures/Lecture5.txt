@@ -1,0 +1,1382 @@
+Creating a Single Datapath from the Parts
+• Assemble the datapath segments and add control lines 
+and multiplexors as needed
+• Single cycle design – fetch, decode and execute each 
+instruction in one clock cycle– no datapath resource can be used more than once per 
+instruction, so some must be duplicated (e.g., separate 
+Instruction Memory and Data Memory, several adders)– multiplexors needed at the input of shared elements with 
+control lines to do the selection– write signals to control writing to the Register File and Data 
+Memory
+• Cycle time is determined by length of the longest path
+Fetch, R, and Memory Access Portions
+MemtoReg
+Read
+Address Instruction
+Instruction
+Memory
+Add
+PC
+4
+Write Data
+Read Addr 1
+Read Addr 2
+Write Addr
+Register
+File
+Read
+Data 1
+Read
+Data 2
+ALU
+ovf
+zero
+ALU control RegWrite
+Data
+Memory
+Address
+Write Data
+Read Data
+MemWrite
+MemRead Sign
+Extend 16 32
+ALUSrc
+Adding the Control
+• Selecting the operations to perform (ALU, 
+Register File and Memory read/write)
+• Controlling the flow of data (multiplexor inputs)
+ Observations
+ op field always in bits 
+31-26
+31
+R-type:
+25
+20
+15
+10
+5
+op rs rt rd funct
+shamt
+0
+31 25 20 15 0
+ addrof registers to 
+be read are always 
+specified by the rs
+field (bits 25-21) and 
+rt field (bits 20-16); 
+for lw and sw rs is the 
+base register
+I-Type: op rs rt address offset
+31 25 0
+J-type:
+op
+target address
+ addr. of register to be written is in one of two places – in rt (bits 20-16) for 
+lw; in rd (bits 15-11) for R-type instructions
+ offset for beq, lw, and sw always in bits 15-0
+Single Cycle Datapath with Control Unit
+Add
+0
+4
+ALUOp
+Branch
+Shift
+left 2
+Add
+1
+Instr[31-26]
+Control
+Unit
+PCSrc
+MemRead
+MemtoReg
+MemWrite
+ALUSrc
+RegDst
+PC
+Instruction
+Memory
+Read
+Address
+Instr[25-21]
+RegWrite
+Read Addr 1
+Instr[20-16]
+Register
+ovf
+Instr[31-0]
+1 
+0
+Instr[15  -11]
+Read Addr 2
+Write Addr
+Read
+Data 1
+File
+Read
+Data 2
+zero
+ALU
+Address
+Data
+Memory
+Read Data
+1
+0 0
+Write Data
+Write Data
+1
+Instr[15-0]
+Sign
+Extend
+16 32
+ALU
+control
+Instr[5-0]
+R-type Instruction Data/Control Flow
+Add
+0
+4
+ALUOp
+Branch
+Shift
+left 2
+Add
+1
+PCSrc
+Instr[31-26]
+Control
+Unit
+MemRead
+MemtoReg
+MemWrite
+ALUSrc
+RegDst
+PC
+Instruction
+Memory
+Read
+Address
+Instr[25-21]
+RegWrite
+Read Addr 1
+Instr[20-16]
+Register
+ovf
+Instr[31-0]
+1 
+0
+Instr[15  -11]
+Read Addr 2
+Write Addr
+Read
+Data 1
+File
+Read
+Data 2
+zero
+ALU
+Address
+Data
+Memory
+Read Data
+1
+0 0
+Write Data
+Write Data
+1
+Instr[15-0]
+Sign
+Extend
+16 32
+ALU
+control
+Instr[5-0]
+Load Word Instruction Data/Control Flow
+Add
+0
+4
+ALUOp
+Branch
+Shift
+left 2
+Add
+1
+PCSrc
+Instr[31-26]
+Control
+Unit
+MemRead
+MemtoReg
+MemWrite
+ALUSrc
+RegDst
+PC
+Instruction
+Memory
+Read
+Address
+Instr[25-21]
+RegWrite
+Read Addr 1
+Instr[20-16]
+Register
+ovf
+Read Addr 2
+Instr[31-0]
+1 
+0
+Instr[15  -11]
+File
+Write Addr
+Read
+Data 1
+Read
+Data 2
+zero
+ALU
+Address
+Data
+Memory
+Read Data
+1
+0 0
+Write Data
+Write Data
+1
+Instr[15-0]
+Sign
+Extend
+16 32
+ALU
+control
+Instr[5-0]
+Branch Instruction Data/Control Flow
+Add
+0
+4
+ALUOp
+Branch
+Shift
+left 2
+Add
+1
+PCSrc
+Instr[31-26]
+Control
+Unit
+MemRead
+MemtoReg
+MemWrite
+ALUSrc
+RegDst
+PC
+Instruction
+Memory
+Read
+Address
+Instr[25-21]
+RegWrite
+Read Addr 1
+Instr[20-16]
+Register
+ovf
+Instr[31-0]
+1 
+0
+Instr[15  -11]
+Read Addr 2
+Write Addr
+Read
+Data 1
+File
+Read
+Data 2
+zero
+ALU
+Address
+Data
+Memory
+Read Data
+1
+0 0
+Write Data
+Write Data
+1
+Instr[15-0]
+Sign
+Extend
+16 32
+ALU
+control
+Instr[5-0]
+Adding the Jump Operation 
+Instr[25-0]
+Add
+26
+Shift
+left 2
+28
+32
+PC+4[31-28]
+0
+0
+1
+4
+ALUOp
+Jump
+Branch
+Shift
+left 2
+Add
+1
+Instr[31-26]
+Control
+Unit
+PCSrc
+MemRead
+MemtoReg
+MemWrite
+ALUSrc
+RegDst
+PC
+Instruction
+Memory
+Read
+Address
+Instr[25-21]
+RegWrite
+Read Addr 1
+Instr[20-16]
+Register
+ovf
+Instr[31-0]
+1 
+0
+Instr[15  -11]
+Read Addr 2
+Write Addr
+Read
+Data 1
+File
+Read
+Data 2
+zero
+ALU
+Address
+Data
+Memory
+Read Data
+1
+0 0
+Write Data
+Write Data
+1
+Instr[15-0]
+Sign
+Extend
+16 32
+ALU
+control
+Instr[5-0]
+Fig.4.24 (p.329)
+Instr[25-0]
+Add
+26
+Shift
+left 2
+28
+32
+PC+4[31-28]
+0
+0
+1
+4
+ALUOp
+Jump
+Branch
+Shift
+left 2
+Add
+1
+Instr[31-26]
+Control
+Unit
+PCSrc
+MemRead
+MemtoReg
+MemWrite
+ALUSrc
+RegDst
+PC
+Instruction
+Memory
+Read
+Address
+Instr[25-21]
+RegWrite
+Read Addr 1
+Instr[20-16]
+Register
+ovf
+Instr[31-0]
+1 
+0
+Instr[15  -11]
+Read Addr 2
+Write Addr
+Read
+Data 1
+File
+Read
+Data 2
+zero
+ALU
+Address
+Data
+Memory
+Read Data
+1
+0 0
+Write Data
+Write Data
+1
+Instr[15-0]
+Sign
+Extend
+16 32
+ALU
+control
+Instr[5-0]
+Implementing the Control Units 
+• The control unit includes mainly
+1. ALU control unit
+2. Main control unit
+• Using only combinational circuits (simple!)
+• Inputs are from each instruction’s– op-code field (6 bits [31:26]) for all instructions, and – funct field (6 bits [5:0]) for R-type instructions.
+• Outputs are the control lines to control – ALU, – Multiplexers,– registers, and – memory
+Implementing ALU Control Unit (I)
+• Inputs:    6-bit function code, plus 2-bit ALUOp from 
+main control unit
+• Outputs: 4-bit ALU control lines used to decide 
+which operation ALU performs 
+Implementing ALU Control Unit (II)
+• Unit Inputs: ALUOp code (2 bits) and Funct field (6 bits) – ALUOp code is generated at the main control unit 
+• Unit Outputs: ALU control lines (4 bits)
+ALUOp
+• The circuit for ALU control unit
+• Obtained through combinational 
+digital logic design method
+F3
+ALUOp0
+ALUOp1
+ALU control block
+F2
+F (5–0)
+F1
+Operation2
+Operation1
+Operation0
+F0
+Operation
+Implementing Main Control Unit (I)
+• Inputs are 6-bit op-code from all instructions– op-code field (6 bits [31:26])
+• Outputs (10-bit) are the control lines to control – Memory (2 bits)
+• MemRead, MemWrite– Multiplexers (5 bits)
+• RegDst, (Jump), Branch, MemtoReg, ALUSrc, – Registers (1 bit)
+• RegWrite– and 2-bit ALUOp (2 bits)
+• ALUOp0, ALUOp1
+Implementing Main Control Unit (II)
+The Outputs of Main Control Unit 
+Implementing Main Control Unit (III)
+Truth table for main control unit:
+Implementing Main Control Unit (IV)
+The circuit for main control unit:
+Inputs
+Op5
+Op4
+Op3
+Op2
+Op1
+Op0
+R-format
+Iw
+sw
+Outputs
+beq
+RegDst
+ALUSrc
+MemtoReg
+RegWrite
+MemRead
+MemWrite
+Branch
+ALUOp1
+ALUOpO
+Handle the Jump Instruction
+• For jump instruction, the target address can be formed with the 
+concatenation of– The upper 4 bits of [PC]+4– The 26-bit immediate field of the jump instruction– The bits 00
+• For main control unit, add an output control signal Jump, which is “1” when 
+the 6-bit op-code matches that of instruction j.
+Implementation of a MIPS Processor 
+Instruction Critical Paths
+Instr. I Mem Reg Rd ALU Op D Mem Reg Wr Total
+R
+type
+load
+store
+beq
+jump
+200 100 200 100 600
+200 100 200 200 100 800
+What is the clock cycle time assuming negligible delays for 
+muxes, control unit, sign extend, PC access, shift left 2, wires, 
+setup and hold times except:
+Instruction and Data Memory (200 ps)
+ALU and adders (200 ps)
+Register File access (reads or writes) (100 ps)
+200 100 200 200 700
+200 100 200 500
+200 200
+Single Cycle Disadvantages & Advantages
+• One instruction is completed in one single cycle
+• Cycle time has to be chosen as the max time delay– i.e., 800 ns
+Clk
+Cycle 1
+lw
+Cycle 2
+sw Waste
+• Uses the clock cycle inefficiently – the clock cycle must 
+be timed to accommodate the slowest instruction– especially problematic for more complex instructions like 
+floating point multiple cycle
+but
+• Is simple and easy to understand
+How Can We Make It Faster?
+• Start fetching and executing the next instruction 
+before the current one has completed– Pipelining– (all?) modern processors are pipelined for 
+performance– Remember the performance equation:                                              
+CPU time = CPI * CC * IC
+• Under ideal conditions and with a large number of 
+instructions, the speedup from pipelining is 
+approximately equal to the number of pipe stages– A five stage pipeline is nearly five times faster because the 
+CC is nearly five times faster
+ Fetch (and execute) more than one instruction at a time
+ Superscalar processing – stay tuned
+The Five Stages of Load Instruction
+lw
+Cycle 1 Cycle 2
+IFetch
+Dec
+Cycle 3 Cycle 4 Cycle 5
+Exec
+Mem
+WB
+• IFetch: Instruction Fetch and Update PC
+• Dec: Registers Fetch and Instruction Decode
+• Exec: Execute R-type; calculate memory address
+• Mem: Read/write the data from/to the Data 
+Memory
+• WB: Write the result data into the register file
+A Pipelined MIPS Processor
+• Start the next instruction before the current one has completed– improves throughput- total amount of work done in a given time– instruction latency (execution time, delay time, response time - time 
+from the start of an instruction to its completion) is not reduced
+Cycle 1 Cycle 2
+Cycle 3 Cycle 4 Cycle 5
+Cycle 7
+Cycle 6 Cycle 8
+lw
+IFetch
+Dec
+Exec
+Mem
+WB
+sw
+IFetch
+Dec
+Exec
+Mem
+WB
+R-type
+IFetch
+Dec
+Exec
+Mem
+WB- clock cycle (pipeline stage time) is limited by the slowest stage- for some stages don’t need the whole clock cycle (e.g., WB)- for some instructions, some stages are wasted cycles (i.e., nothing is 
+done during that cycle for that instruction)
+Single Cycle versus Pipeline
+Single Cycle Implementation (CC = 800 ps):
+Clk
+Cycle 1
+Cycle 2
+lw
+sw
+Pipeline Implementation (CC = 200 ps):
+Waste
+400 ps
+lw
+IFetch
+sw
+Dec
+Exec
+IFetch
+Mem
+Dec
+WB
+Exec
+R-type
+IFetch
+Mem
+Dec
+Exec
+WB
+Mem
+WB
+ To complete an entire instruction in the pipelined case takes 
+1000 ps (as compared to 800 ps for the single cycle case).  
+Why ?
+ How long does each take to complete 1,000,000 adds ?
+Pipelining the MIPS ISA
+• What makes it easy– all instructions are the same length (32 bits)
+• can fetch in the 1st stage and decode in the 2nd stage– few instruction formats (three) with symmetry across 
+formats
+• can begin reading register file in 2nd stage– memory operations occur only in loads and stores
+• can use the execute stage to calculate memory addresses– each instruction writes at most one result (i.e., changes 
+the machine state) and does it in the last few pipeline 
+stages (MEM or WB)– operands must be aligned in memory so a single data 
+transfer takes only one data memory access
+MIPS Pipeline DatapathAdditions/Mods
+• State registersbetween each pipeline stage to isolatethem
+IF:IFetch ID:Dec EX:Execute MEM:
+MemAccess
+WB:
+WriteBack
+Read
+Address
+Instruction
+Memory
+Add
+PC
+4
+Write Data
+Read Addr 1
+Read Addr 2
+Write Addr
+Register
+File
+Read
+Data 1
+Read
+Data 2
+16 32
+ALU
+Shift
+left 2
+Add
+Data
+Memory
+Address
+Write Data
+Read
+Data
+IF/ID
+Sign
+Extend
+ID/EX EX/MEM
+MEM/WB
+System Clock
+MIPS Pipeline Control Path Modifications
+• All control signals can be determined during Decode– and held in the state registers between pipeline stages
+4
+Add
+ID/EX
+Control
+EX/MEM
+IF/ID
+RegWrite
+Branch
+PCSrc
+MEM/WB
+Add
+PC
+Instruction
+Memory
+Read
+Address
+Read Addr 1
+Register
+Read Addr 2
+File
+Write Addr
+Write Data
+Shift
+left 2
+Read
+Data 1
+Read
+Data 2
+ALUSrc
+ALU
+ALU
+cntrl
+Address
+Data
+Memory
+Read
+Data
+Write Data
+Sign
+Extend
+MemRead
+MemtoReg
+16 32
+ALUOp
+RegDst
+Pipeline Control
+• IF Stage:  read InstrMemory (always asserted) 
+and write PC (on System Clock)
+• ID Stage:  no optional control signals to set
+EX Stage MEM Stage WB Stage
+Reg
+Dst
+ALU
+Op1
+ALU
+Op0
+ALU
+Src
+Brch Mem
+Read
+Mem
+Write
+Reg
+Write
+Mem 
+toReg
+R 1 1 0 0 0 0 0 1 0
+lw 0 0 0 1 0 1 0 1 1
+sw X 0 0 1 0 0 1 0 X
+beq X 0 1 0 1 0 0 0 X
+Graphically Representing MIPS Pipeline
+IM
+Reg
+ALU
+DM
+Reg
+• Can help with answering questions like:– How many cycles does it take to execute this code?– What is the ALU doing during cycle 4?– Is there a hazard, why does it occur, and how can it be fixed?
+Why Pipeline? For Performance!
+Time (clock cycles)
+I
+n
+s
+t
+r.
+Inst 0
+IM
+Reg
+ALU
+DM
+Inst 1
+IM
+Reg
+ALU
+Reg
+DM
+O
+r
+Inst 2
+IM
+Reg
+ALU
+Reg
+DM
+d
+e
+r
+Inst 3
+IM
+Reg
+ALU
+Inst 4
+Time to fill the pipeline
+IM
+Reg
+Once the pipeline 
+is full, one 
+instruction is 
+completed every 
+cycle, so CPI = 1
+Reg
+DM
+ALU
+Reg
+DM
+Reg
+Can Pipelining Get Us Into Trouble?
+• Yes: Pipeline Hazards– structural hazards: attempt to use the same resource by 
+two different instructions at the same time– data hazards: attempt to use data before it is ready
+• An instruction’s source operand(s) are produced by a prior 
+instruction still in the pipeline– control hazards: attempt to make a decision about 
+program control flow before the condition has been 
+evaluated and the new PC target address calculated
+• branch and jump instructions, exceptions
+Can usually resolve hazards by waiting
+ pipeline control must detect the hazard
+ and take action to resolve hazards
+A Single Memory Would Be a Structural Hazard
+Time (clock cycles)
+I
+n
+s
+t
+r.
+O
+r
+d
+e
+r
+lw
+Inst 1
+Inst 2
+Inst 3
+Inst 4
+Mem
+Reg
+Mem
+Reg
+Mem
+Reading instruction 
+from memory
+ALU
+Mem
+ALU
+Reg
+Mem
+Reg
+ALU
+Reg
+Mem
+Reading data from 
+memory
+Mem
+Reg
+ALU
+Reg
+Mem
+Mem
+Reg
+ALU
+Reg
+Mem
+Reg
+ Fix with separate instr and data memories 
+How About Register File Access?
+Time (clock cycles)
+I
+n
+s
+t
+r.
+add $t1,
+IM
+Reg
+ALU
+DM
+Inst 1
+IM
+Reg
+ALU
+Reg
+DM
+O
+r
+d
+e
+r
+Inst 2
+IM
+Reg
+ALU
+Reg
+DM
+add $t2,$t1,
+IM
+Reg
+ALU
+clock edge that controls 
+register writing
+Fix register file access 
+hazard by doing 
+reads in the second 
+half of the cycle and 
+writes in the first half
+Reg
+DM
+Reg
+clock edge that controls 
+loading of pipeline state 
+registers
+Register Usage Can Cause Data Hazards
+ALU
+IM Reg DM Reg
+ALU
+IM Reg DM Reg
+ALU
+IM Reg DM Reg
+ALU
+IM Reg DM Reg
+ALU
+IM Reg DM Reg
+• Dependencies backward in time cause hazards
+add $t1,$s0,$s1
+sub $t4,$t1,$t5
+and $t6,$t1,$t7
+xor $t4,$t1,$t5
+or  $t8,$t1,$t9
+Read before writedata hazard
+Loads Can Cause Data Hazards
+I
+n
+s
+t
+r.
+O
+r
+d
+e
+r
+lw $t1,4($t2)
+sub $t4,$t1,$t5
+and $t6,$t1,$t7
+xor $t4,$t1,$t5
+or  $t8,$t1,$t9
+ALU
+IM Reg DM Reg
+ALU
+IM Reg DM Reg
+ALU
+IM Reg DM Reg
+ALU
+IM Reg DM Reg
+ALU
+IM Reg DM Reg
+• Dependencies backward in time cause hazards
+Load-usedata hazard
+Branch Instructions Cause Control Hazards
+• Dependencies backward in time cause hazards
+I
+n
+s
+t
+r.
+beq
+IM
+Reg
+ALU
+DM
+Reg
+lw
+IM
+Reg
+ALU
+DM
+O
+r
+Inst 3
+IM
+Reg
+ALU
+Reg
+DM
+d
+e
+r
+Inst 4
+IM
+Reg
+ALU
+Reg
+DM
+Reg
+Summary
+• All modern day processors use pipelining
+• Pipelining doesn’t help latency of single task, it helps 
+throughput of entire workload
+• Potential speedup:  CPI = 1
+• Pipeline rate limited by slowest pipeline stage– Unbalanced pipe stages makes for inefficiencies– The time to “fill” pipeline and time to “drain” it can 
+impact speedup for deep pipelines and short code runs
+• Must detect and resolve hazards– Stalling negatively affects CPI (makes CPI larger than the 
+ideal of 1)
+Problem
+In a pipeline system, there are five-stages:-IF: Fetch an instruction from instruction 
+memory.-ID: Decode the instruction and read register 
+values-EX: Perform an ALU operation as specified 
+by the instruction-MEM: Access the memory to read or write 
+data.-WB: Write the result to one of the registers in 
+the register file.
+Line
+1
+2
+3
+4
+5
+6
+Loop:
+Loop2
+:
+addi             
+addi        
+subi       
+bne      
+subi       
+bne      
+$t2, $zero, 10
+$s2, $s2, 2
+$t2, $t2, 1
+$t2, $zero, Loop2
+$t1, $t1, 1
+$t1, $zero, Loop
+Problem
+• Each stage takes one clock cycle. The bne instruction will 
+finish in the 3rd stage, while addi and subi will finish in the 
+5th stage. Writing to a register is done in the first half of a 
+clock cycle while reading is done in the second half cycle. 
+Assume all branches are perfectly predicted (no control 
+hazards), and that NOP instructions takes only 2 stages (IF 
+and ID). The individual stages of the datapath have the 
+following latencies:
+IF
+400 ps
+ID
+EX
+MEM WB
+250 ps
+200 ps
+400 ps
+140 ps
+Draw the pipeline system in your draft sheet and use it to 
+choose the best answer in the following questions. 
+Problem
+1 2 3 4 5 6 7 8 9 10
+1 L1: lw $t1, 
+40($t6)
+IF ID EX MEM WB
+$t6 $t1
+2 beq $t2, $t3, 
+L2
+IF ID EX MEM
+X
+WB
+$t2, 
+$t3
+X
+3 add $t1, $t1, 
+$t4
+IF ID EX MEM
+X
+WB
+$t4, 
+$t1
+$t1
+4 L2: beq $t1, $t2, 
+L1
+IF ID EX ME
+M
+X
+WB
+X $t1, 
+$t2
+5 sw $t2, 
+20($t4)
+IF ID EX ME
+M
+WB
+$t2,$t
+4
+X
+6 and     $t1, $t1, 
+$t4
+IF ID EX WB
+$t1 $t1, 
+$t4
+Problem
+• Assume all branches are perfectly predicted (no control 
+hazards). Find all data hazards, given initially: $t1=0, 
+$t2=$t3=$t4=50, $t6=10, and M[50]=75
+1 2 3 4 5 6 7 8 9 10
+1 L1
+:
+lw $t1, 
+40($t6)
+IF ID EX MEM WB
+$t6 $t1
+2 beq $t2, $t3, 
+L2
+IF ID EX MEM
+X
+WB
+$t2, 
+$t3
+X
+3
+4
+L2
+:
+beq $t1, $t2, 
+L1
+IF ID
+$t1, 
+$t2
+EX MEM
+X
+WB
+X
+5
+sw $t2, 
+20($t4)
+IF ID
+$t2,$t
+4
+EX ME
+M
+WB
+X
+and     $t1, $t1, 
+$t4
+IF ID
+$t1, 
+$t4
+EX WB
+$t1
+Problem
+• Solve the hazards in (a) by inserting the minimum number of NOP 
+instructions. (Draw a figure showing the active pipeline stage at each 
+clock cycle). 
+• How many clock cycles does it take to finish execution of these 
+instructions?
+1 2 3 4 5 6 7 8 9 10
+1 L1
+:
+lw $t1, 
+40($t6)
+IF ID EX MEM WB
+$t6 $t1
+2 beq $t2, $t3, 
+L2
+IF ID EX MEM
+X
+WB
+$t2, 
+$t3
+X
+3 NOP IF ID EX
+X
+MEM
+X
+WB
+X
+4 L2
+:
+beq $t1, $t2, 
+L1
+IF ID EX ME
+M
+X
+WB
+X $t1, 
+$t2
+5 sw $t2, 
+20($t4)
+IF ID EX ME
+M
+WB
+$t2,$t
+4
+X
+6 and     $t1, $t1, 
+$t4
+IF ID EX WB
+$t1 $t1, 
+$t4
+Problem
+• Repeat (a) and (b), given initially: $t1=0, 
+$t2=60, $t3=$t4=50, $t6=10, and M[50]=75
+1 2 3 4 5 6 7 8 9 10
+1 L1: lw $t1, 
+40($t6)
+IF ID EX MEM WB
+$t6 $t1
+2 beq $t2, $t3, 
+L2
+IF ID EX MEM
+X
+WB
+$t2, 
+$t3
+X
+3 add $t1, $t1, 
+$t4
+IF ID EX MEM
+X
+WB
+$t4, 
+$t1
+$t1
+4 L2: beq $t1, $t2, 
+L1
+IF ID EX ME
+M
+X
+WB
+X $t1, 
+$t2
+5 sw $t2, 
+20($t4)
+IF ID EX ME
+M
+WB
+$t2,$t
+4
+X
+6 and     $t1, $t1, 
+$t4
+IF ID EX WB
+$t1 $t1, 
+$t4
+Problem
+1 2 3 4 5 6 7 8 9 10 11 12 13
+1 L
+1:
+lw $t1, 
+40($t6)
+IF ID EX MEM WB
+$t6 $t1
+2 beq $t2, $t3, 
+L2
+IF ID EX MEM
+X
+WB
+$t2, 
+$t3
+X
+NO
+P
+IF ID EX
+X
+MEM
+X
+WB
+X
+3 add $t1, $t1, 
+$t4
+IF ID
+$t4, 
+$t1
+EX ME
+M
+X
+WB
+$t1
+NO
+P
+IF ID EX
+X
+MEM
+X
+WB
+X
+NO
+P
+IF ID EX
+X
+MEM
+X
+WB
+X
+4 L
+2:
+beq $t1, $t2, 
+L1
+IF ID
+$t1, 
+$t2
+EX ME
+M
+X
+WB
+X
+5 sw $t2, 
+20($t4)
+IF ID
+$t2,$t
+4
+EX ME
+M
+WB
+X
+6 and     $t1, $t1, 
+$t4
+IF ID
+$t1, 
+$t4
+EX ME
+M
+X
+WB
+$t1
+Problem
+• Assume that branches are always not taken (predicted to 
+be FALSE). Calculate number of clock cycles needed to 
+finish the instructions, after solving data hazards, if:
+• Initially: $t1=0, $t2=$t3=$t4=50, $t6=10, and M[50]=75
+1 2 3 4 5 6 7 8 9 10
+1 L1: lw $t1, 40($t6) IF ID EX MEM WB
+$t6 $t1
+2 beq $t2, $t3, L2 IF ID EX MEM
+X
+WB
+$t2, 
+$t3
+X
+3 add $t1, $t1, 
+$t4
+IF ID EX MEM
+X
+WB
+$t4, 
+$t1
+$t1
+4 L2: beq $t1, $t2, L1 IF ID EX ME
+M
+X
+WB
+X $t1, 
+$t2
+5 sw $t2, 20($t4) IF ID EX ME
+M
+WB
+$t2,$t4 X
+6 and     $t1, $t1, 
+$t4
+IF ID EX WB
+$t1 $t1, 
+$t4
+Problem
+• Assume the individual stages of the datapath have the 
+following latencies:
+IF
+240 ps
+ID
+EX
+MEM
+WB
+150 ps
+120 ps
+200 ps
+140 ps– What is the clock cycle time for the single cycle processor (no 
+pipeline)?– What is the clock cycle time for the multi cycle processor?
+• Using the clock cycle time from (e), how much time does it 
+take to process the instructions with pipelining in case (b) 
+and (c), and without pipelining (single cycle)?
+• If we can split one stage of the pipelined datapath into two 
+new stages, each with half the latency of the original stage, 
+which stage would you split? What is the clock cycle time 
+for the pipelined processor?

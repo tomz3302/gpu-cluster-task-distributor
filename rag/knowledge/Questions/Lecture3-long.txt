@@ -1,0 +1,51 @@
+Long Answer Questions
+
+What are the main goals of a computer designer when selecting an assembly language?
+
+Explain the MIPS design principle of simplicity favors regularity using arithmetic instructions as an example.
+
+What is the difference between a general-purpose register architecture like MIPS and architectures with dedicated registers?
+
+Describe the role of the compiler when programs have more variables than the machine has registers.
+
+Explain the difference between big-endian and little-endian memory addressing.
+
+Why is MIPS called a load/store architecture?
+
+Explain the concept of sign extension when using an immediate operand in MIPS.
+
+How does the load upper immediate instruction handle large 32-bit constants?
+
+Describe the conflict between the desire to keep all instructions the same length and the desire to have a single instruction format in MIPS.
+
+Outline the steps required to assemble a MIPS assembly instruction into machine code.
+
+How do decision-making instructions alter the control flow of a program?
+
+Why doesn't the MIPS architecture include a single compare and branch instruction?
+
+How does the assembler utilize the $at register when handling pseudoinstructions?
+
+Explain how PC-relative addressing calculates the jump-to address for conditional branches.
+
+Why is the branch offset in MIPS counted in words rather than bytes?
+
+Describe how pseudodirect addressing works for J-format instructions in MIPS.
+
+Explain the six steps involved in procedure calls within a MIPS program.
+
+What is the role of the stack pointer during a procedure call in MIPS?
+
+Explain the difference between leaf procedures and nested procedures in MIPS.
+
+How does an accumulator architecture handle arithmetic operations compared to a load-store architecture?
+
+What are the advantages and disadvantages of using variable length instructions in compact code architectures?
+
+Describe the advantages and disadvantages of a stack architecture.
+
+What are the main motivations that led to the development of the RISC philosophy?
+
+Discuss the disadvantages realized by the RISC architecture.
+
+Explain the difference in how instruction set choices are driven in CISC versus RISC architectures.

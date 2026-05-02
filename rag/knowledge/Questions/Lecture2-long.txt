@@ -1,0 +1,51 @@
+Long Answer Questions
+
+Explain the difference between execution time and throughput, and describe which type of computer user focuses on each.
+
+Detail the difference between user CPU time and system CPU time, and explain why it is hard to differentiate between them.
+
+How does adding additional processors to a system used for multiple separate tasks affect response time and throughput?
+
+Explain the difference between static instruction count and dynamic instruction count.
+
+Describe how the total CPU clock cycles for a program can be calculated using instruction classes and their individual CPIs.
+
+Outline the two ways the CPU execution time for a program can be expressed using instruction count, CPI, and clock rate or clock cycle time.
+
+Discuss how the chosen algorithm affects the factors in the CPU performance equation.
+
+How does the Instruction Set Architecture impact the factors of the CPU performance equation?
+
+What are the main problems with using MIPS as a measure for comparing the performance of different computers?
+
+Explain what relative MIPS is and describe the problems associated with using it as a performance metric.
+
+What is the problem with using simple MFLOPS as a metric, and how does normalized MFLOPS solve this issue?
+
+State Amdahl's Law and explain the concept of the law of diminishing returns in computing.
+
+Explain how Amdahl's Law determines the overall speedup based on the fraction of computation time improved and the speedup of that specific improvement.
+
+Why is it a common hardware design theme to "make the common case fast" according to Amdahl's law?
+
+What is the key advantage of using the CPU performance equation over Amdahl's law when measuring computer performance?
+
+Explain the practical power limit issue that led to the "Power Wall" and the abandonment of the Pentium 4 line.
+
+Describe the specific factors that determine the dynamic power dissipation in a CMOS Integrated Circuit.
+
+Why does increasing the number of transistors increase power dissipation even if the transistors are always turned off?
+
+Discuss the specific challenges programmers face when trying to write explicitly parallel programs for multicore microprocessors.
+
+Describe the four levels of benchmarks used to measure performance, ordered from highest to lowest accuracy.
+
+What is SPEC, and how does the presence of multiple benchmarks in a suite lessen the weakness of any single benchmark?
+
+Explain exactly how the SPEC ratio is calculated for a benchmark program.
+
+Why is the arithmetic mean not recommended for averaging normalized execution times, and what should be used instead?
+
+Explain the concept of equal-time weights when summarizing performance using weighted execution time.
+
+Describe the phenomenon observed in the SPEC CPU95 case study where a processor with a slower clock rate actually demonstrated better performance.

@@ -1,0 +1,51 @@
+Long Answer Questions
+
+Explain the fundamental difference between combinational logic elements and sequential state elements in a processor.
+
+Describe the edge-triggered clocking methodology and explain how it allows a design to legally read and write the same register within a single clock cycle.
+
+Outline the first two identical implementation steps that occur for every instruction in the generic MIPS implementation.
+
+Describe the five MIPS addressing modes summarized in the lecture text.
+
+Detail the specific steps and functional units involved in executing an R-format instruction, such as an addition.
+
+Explain step-by-step how the datapath executes a load word instruction.
+
+Describe exactly how the branch target address is computed during the execution of a branch equal instruction.
+
+Explain the steps involved in executing an unconditional jump instruction and how the new PC address is formulated.
+
+Explain why multiplexors are necessary when combining individual datapath elements into a single-cycle datapath, providing two specific examples from the text.
+
+Describe the function of the small ALU control unit and how it utilizes the ALUOp field and the instruction's funct field.
+
+What is the multiple levels of decoding style, and what are its potential advantages for the processor's control unit?
+
+Explain how the PCSrc control signal is generated and describe exactly what it controls in the datapath.
+
+Describe the operation, inputs, and outputs of the MIPS Register File as a datapath element.
+
+Discuss why a single-cycle implementation with a clock cycle determined by the longest instruction violates the key principle of making the common case fast.
+
+Explain how the main control unit determines the setting of various control lines, and state whether its implementation is combinational or sequential.
+
+In the execution steps for a branch equal instruction, explain the two simultaneous operations related to the ALU and the PC adder.
+
+Detail the specific bit fields of an R-format instruction, indicating the number of bits and the purpose of each field.
+
+Describe the inefficiency of a single-cycle implementation specifically regarding hardware duplication, area, and clock cycle time.
+
+What are the three proposed solutions mentioned in the text to overcome the inefficiencies of the single-cycle design with a fixed clock cycle?
+
+Using the scenario from the text, explain why the ALUSrc and MemRead control signals cannot completely substitute for each other, even if a don't care allows for some overlap.
+
+Trace the critical path of a load word instruction by listing the five functional units it uses in series.
+
+How does the datapath execution differ between a store word and a load word instruction immediately after the ALU computes the memory address?
+
+Why is it considered impractical to use a simple implementation that uses a single long clock cycle for every instruction?
+
+Explain the purpose and operation of the Sign-extension unit within the context of branch and memory-reference instructions.
+
+Discuss the function of the PC adder and explain how it can conceptually be built from a standard ALU.

@@ -1,44 +1,76 @@
-# Virtual Environment
-.venv/
-venv/
-env/
-
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
-*.so
+*.pyo
+*.pyd
 .Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
 
-# IDE
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Environment variables / secrets
+.env
+.env.*
+!.env.example
+
+# IDE / editor
 .vscode/
 .idea/
 *.swp
 *.swo
-*~
 
-# OS
+# OS files
 .DS_Store
 Thumbs.db
 
 # Logs
 *.log
+logs/
 
-# Test results
-test_results.txt
+# Test / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# Jupyter / notebooks
+.ipynb_checkpoints/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# ChromaDB local vector database
+rag/chroma_db/
+rag/chromadb/
+
+# Local model/cache/data files
+models/
+*.gguf
+*.bin
+*.safetensors
+
+# Benchmark outputs
 worker_benchmark_results.csv
+results_*.csv
+*.sqlite3
+*.db
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Large generated outputs
+outputs/
+artifacts/
+
+# Keep knowledge source files tracked unless they contain private data.
+# To ignore knowledge files too, uncomment:
+# rag/knowledge/

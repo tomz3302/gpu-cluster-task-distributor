@@ -1,0 +1,51 @@
+Short Answer Questions
+
+What was the primary constraint on computer performance in the 1960s and 1970s?
+
+What two types of systems software are central to every computer system today?
+
+How do algorithms affect program performance?
+
+What does a compiler do?
+
+What is machine language?
+
+What is the function of an assembler?
+
+Name the five classic components of a computer.
+
+Which two classic components make up a computer's processor?
+
+What is abstraction in the context of computer design?
+
+What does ISA stand for?
+
+What does ABI stand for?
+
+What are the two components of a computer's implementation?
+
+What is the fundamental idea behind the stored-program concept?
+
+Give an example of a nonstored-program computer.
+
+How does the Von Neumann architecture execute instructions?
+
+How does a modern Harvard architecture differ from traditional ones?
+
+What is the primary task of a computer designer?
+
+What are the two key technologies for modern processors?
+
+According to Moore’s Law, how often does the number of transistors on a chip double?
+
+According to Moore's Law, how often does processor speed double?
+
+What was the primary technology used to build computers in the first generation?
+
+How often does memory capacity quadruple according to the DRAM growth rule?
+
+What is a fallacy in computer architecture?
+
+What is a pitfall in computer architecture?
+
+What software strongly affects computer hardware?

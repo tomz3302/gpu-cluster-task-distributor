@@ -1,0 +1,51 @@
+Short Answer Questions
+
+What is another name for program execution time?
+
+What measure of performance is defined as the total amount of work done in a given time?
+
+What does CPU execution time represent?
+
+How does replacing a processor with a faster version affect response time and throughput?
+
+What term is used for the time required for a complete clock cycle?
+
+What is the inverse of the clock period called?
+
+What does the acronym CPI stand for?
+
+Name the three factors that CPU performance depends upon.
+
+Which hardware or software component affects the overall clock rate of the processor?
+
+What does the acronym MIPS stand for?
+
+What is Peak MIPS?
+
+What does FLOPS stand for?
+
+What law is used to calculate the performance gain obtained by improving some portion of a computer?
+
+According to Amdahl's law, what is the corollary regarding the "common case"?
+
+What is the dominant technology used for Integrated Circuits today?
+
+What is the primary source of power dissipation in CMOS?
+
+In the dynamic power equation, what is multiplied by the capacitive load and frequency switched?
+
+What kind of power dissipation occurs because of leakage current even when a transistor is off?
+
+What is a microprocessor containing multiple processors in a single integrated circuit called?
+
+To get a significant improvement in response time on multicore processors, what must programmers do?
+
+What are the two parts that execution time in a multicore system can be split into?
+
+What does SPEC stand for in the context of computer benchmarks?
+
+What type of time is used as the reported measurement in SPEC CPU2006?
+
+What mathematical mean is used to combine normalized SPEC ratio results?
+
+What does a bigger numeric SPEC ratio indicate?
