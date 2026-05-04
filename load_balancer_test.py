@@ -9,13 +9,16 @@ import httpx
 # ---------------------------------------------------------------
 
 # By default, HAProxy frontend is bound to *:8080
-LB_BASE_URL = "http://localhost:8080"
+LB_BASE_URL = "http://127.0.0.1:8080"
 LB_URL = f"{LB_BASE_URL}/generate"
 
 PROMPT = "Explain what load balancing is in one short paragraph."
 MAX_TOKENS = 64
 TEMPERATURE = 0.2
 
+REQUEST_HEADERS = {
+    "ngrok-skip-browser-warning": "true",
+}
 
 # ---------------------------------------------------------------
 # Utilities
@@ -43,6 +46,7 @@ async def send_request(client: httpx.AsyncClient, request_id: int) -> dict:
     try:
         response = await client.post(
             LB_URL,
+            headers=REQUEST_HEADERS,
             json={
                 "id": request_id,
                 "query": PROMPT,
