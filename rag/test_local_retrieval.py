@@ -12,7 +12,7 @@ EMBEDDING_MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 
 
 def main():
-    query = "How to measure CPU utilization?"
+    query = "Explain what load balancing is in one short paragraph."
 
     print("Loading embedding model...")
     embedding_model = SentenceTransformer(EMBEDDING_MODEL_NAME)

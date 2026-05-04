@@ -1,20 +1,12 @@
 version: '3.8'
 
 services:
-  # The Load Balancer
   haproxy:
     image: haproxy:latest
+    container_name: gpu-load-balancer
     volumes:
       - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
     ports:
-      - "8080:8080"
-      - "8404:8404"
-    depends_on:
-      - worker
-
-  # GPU Worker Node Service (Template for scaling)
-  worker:
-    build: .
-    volumes:
-      - .:/app
-    command: uvicorn worker:app --host 0.0.0.0 --port 8001 --reload
+      - "8080:8080"  # Frontend for requests
+      - "8404:8404"  # Stats dashboard
+    restart: unless-stopped
