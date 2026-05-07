@@ -58,7 +58,9 @@ async def send_request(client: httpx.AsyncClient, request_id: int) -> dict:
                 "success": False,
                 "latency": total_latency,
                 "queue_time": 0.0,
+                "retrieval_time": 0.0,
                 "inference_time": 0.0,
+                "idle_time": 0.0,
                 "error": response.text,
             }
 
@@ -67,7 +69,9 @@ async def send_request(client: httpx.AsyncClient, request_id: int) -> dict:
             "success": True,
             "latency": total_latency,
             "queue_time": data.get("queue_time", 0.0),
+            "retrieval_time": data.get("retrieval_time", 0.0),
             "inference_time": data.get("inference_time", 0.0),
+            "idle_time": data.get("idle_time", 0.0),
             "error": None,
         }
 
@@ -76,7 +80,9 @@ async def send_request(client: httpx.AsyncClient, request_id: int) -> dict:
             "success": False,
             "latency": time.perf_counter() - start,
             "queue_time": 0.0,
+            "retrieval_time": 0.0,
             "inference_time": 0.0,
+            "idle_time": 0.0,
             "error": str(e),
         }
 
@@ -112,7 +118,9 @@ async def run_test(concurrency: int, total_requests: int) -> dict:
 
     latencies       = [r["latency"]        for r in successes]
     queue_times     = [r["queue_time"]     for r in successes]
+    retrieval_times = [r["retrieval_time"] for r in successes]
     inference_times = [r["inference_time"] for r in successes]
+    idle_times      = [r["idle_time"]      for r in successes]
 
     successful_requests = len(successes)
     failed_requests     = len(failures)
@@ -123,7 +131,9 @@ async def run_test(concurrency: int, total_requests: int) -> dict:
     min_latency        = min(latencies)                   if latencies       else 0.0
     max_latency        = max(latencies)                   if latencies       else 0.0
     avg_queue_time     = statistics.mean(queue_times)     if queue_times     else 0.0
+    avg_retrieval_time = statistics.mean(retrieval_times) if retrieval_times else 0.0
     avg_inference_time = statistics.mean(inference_times) if inference_times else 0.0
+    avg_idle_time      = statistics.mean(idle_times)      if idle_times      else 0.0
 
     print(f"Successful requests:     {successful_requests}")
     print(f"Failed requests:         {failed_requests}")
@@ -134,7 +144,9 @@ async def run_test(concurrency: int, total_requests: int) -> dict:
     print(f"Min latency:             {min_latency:.2f} s")
     print(f"Max latency:             {max_latency:.2f} s")
     print(f"Average queue time:      {avg_queue_time:.2f} s")
+    print(f"Average retrieval time:  {avg_retrieval_time:.2f} s")
     print(f"Average inference time:  {avg_inference_time:.2f} s")
+    print(f"Average worker idle:     {avg_idle_time:.2f} s")
 
     if failures:
         print(f"Example error:           {failures[0]['error']}")
@@ -151,7 +163,9 @@ async def run_test(concurrency: int, total_requests: int) -> dict:
         "min_latency_sec":         round(min_latency,       4),
         "max_latency_sec":         round(max_latency,       4),
         "avg_queue_time_sec":      round(avg_queue_time,    4),
+        "avg_retrieval_time_sec":  round(avg_retrieval_time, 4),
         "avg_inference_time_sec":  round(avg_inference_time,4),
+        "avg_idle_time_sec":       round(avg_idle_time,     4),
     }
 
 
@@ -164,15 +178,15 @@ def print_summary(all_results: list[dict]):
     print("BENCHMARK SUMMARY")
     print_separator()
 
-    col_w = [8, 8, 8, 8, 10, 10, 10, 10, 12, 12]
+    col_w = [6, 6, 6, 6, 8, 8, 8, 8, 8, 8, 8, 8]
     headers = [
         "Conc.", "Total", "OK", "Fail",
         "Time(s)", "Req/s", "Avg(s)", "P95(s)",
-        "Queue(s)", "Infer(s)",
+        "Queue(s)", "Retr(s)", "Infer(s)", "Idle(s)"
     ]
     row_fmt = "  ".join(f"{{:<{w}}}" for w in col_w)
     print(row_fmt.format(*headers))
-    print("-" * 100)
+    print("-" * 120)
 
     for r in all_results:
         print(row_fmt.format(
@@ -185,7 +199,9 @@ def print_summary(all_results: list[dict]):
             r["avg_latency_sec"],
             r["p95_latency_sec"],
             r["avg_queue_time_sec"],
+            r["avg_retrieval_time_sec"],
             r["avg_inference_time_sec"],
+            r["avg_idle_time_sec"],
         ))
 
     print_separator()
