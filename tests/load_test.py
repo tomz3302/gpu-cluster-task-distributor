@@ -1,4 +1,5 @@
 import asyncio
+import collections
 import statistics
 import time
 
@@ -67,6 +68,7 @@ async def send_request(client: httpx.AsyncClient, request_id: int) -> dict:
         data = response.json()
         return {
             "success": True,
+            "worker_name": data.get("worker_name", "unknown"),
             "latency": total_latency,
             "queue_time": data.get("queue_time", 0.0),
             "retrieval_time": data.get("retrieval_time", 0.0),
@@ -120,7 +122,6 @@ async def run_test(concurrency: int, total_requests: int) -> dict:
     queue_times     = [r["queue_time"]     for r in successes]
     retrieval_times = [r["retrieval_time"] for r in successes]
     inference_times = [r["inference_time"] for r in successes]
-    idle_times      = [r["idle_time"]      for r in successes]
 
     successful_requests = len(successes)
     failed_requests     = len(failures)
@@ -133,7 +134,27 @@ async def run_test(concurrency: int, total_requests: int) -> dict:
     avg_queue_time     = statistics.mean(queue_times)     if queue_times     else 0.0
     avg_retrieval_time = statistics.mean(retrieval_times) if retrieval_times else 0.0
     avg_inference_time = statistics.mean(inference_times) if inference_times else 0.0
-    avg_idle_time      = statistics.mean(idle_times)      if idle_times      else 0.0
+    
+    # Group results by worker
+    worker_results = collections.defaultdict(list)
+    for r in successes:
+        worker_results[r["worker_name"]].append(r["idle_time"])
+
+    # Calculate per-worker utilization
+    worker_utilizations = []
+    print(f"Workers detected: {len(worker_results)}")
+    for worker, idle_snapshots in worker_results.items():
+        if len(idle_snapshots) >= 2:
+            # idle_snapshots is cumulative. Utilization = 1 - (delta_idle / total_time)
+            delta_idle = max(idle_snapshots) - min(idle_snapshots)
+            u = 1.0 - (delta_idle / total_time)
+            u = max(0.0, min(1.0, u)) # Clamp to [0, 1]
+            worker_utilizations.append(u)
+            print(f"  - {worker}: {u * 100:.2f}% utilization")
+        else:
+            print(f"  - {worker}: Insufficient data (<2 requests)")
+
+    cluster_utilization = statistics.mean(worker_utilizations) if worker_utilizations else 0.0
 
     print(f"Successful requests:     {successful_requests}")
     print(f"Failed requests:         {failed_requests}")
@@ -146,7 +167,7 @@ async def run_test(concurrency: int, total_requests: int) -> dict:
     print(f"Average queue time:      {avg_queue_time:.2f} s")
     print(f"Average retrieval time:  {avg_retrieval_time:.2f} s")
     print(f"Average inference time:  {avg_inference_time:.2f} s")
-    print(f"Average worker idle:     {avg_idle_time:.2f} s")
+    print(f"Cluster Utilization:     {cluster_utilization * 100:.2f}%")
 
     if failures:
         print(f"Example error:           {failures[0]['error']}")
@@ -165,7 +186,7 @@ async def run_test(concurrency: int, total_requests: int) -> dict:
         "avg_queue_time_sec":      round(avg_queue_time,    4),
         "avg_retrieval_time_sec":  round(avg_retrieval_time, 4),
         "avg_inference_time_sec":  round(avg_inference_time,4),
-        "avg_idle_time_sec":       round(avg_idle_time,     4),
+        "utilization":             round(cluster_utilization, 4),
     }
 
 
@@ -182,7 +203,7 @@ def print_summary(all_results: list[dict]):
     headers = [
         "Conc.", "Total", "OK", "Fail",
         "Time(s)", "Req/s", "Avg(s)", "P95(s)",
-        "Queue(s)", "Retr(s)", "Infer(s)", "Idle(s)"
+        "Queue(s)", "Retr(s)", "Infer(s)", "Utilization"
     ]
     row_fmt = "  ".join(f"{{:<{w}}}" for w in col_w)
     print(row_fmt.format(*headers))
@@ -201,7 +222,7 @@ def print_summary(all_results: list[dict]):
             r["avg_queue_time_sec"],
             r["avg_retrieval_time_sec"],
             r["avg_inference_time_sec"],
-            r["avg_idle_time_sec"],
+            f"{r['utilization']*100:.1f}%",
         ))
 
     print_separator()
