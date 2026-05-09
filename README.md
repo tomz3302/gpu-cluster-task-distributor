@@ -689,3 +689,29 @@ MAX_TOKENS = 64
 
 ---
 
+## 22. Running the GUI Chat Interface
+
+We have built a simple, sleek chat GUI to interact with the cluster!
+
+### Prerequisites:
+Make sure your HAProxy (load balancer) is running on `http://localhost:8080/generate` before starting the GUI.
+
+### Steps to Use:
+1. Open a PowerShell/Terminal window in the project root.
+2. Activate your virtual environment:
+   ```powershell
+   .venv\Scripts\activate
+   ```
+3. Run the GUI Python file:
+   ```powershell
+   python Simple_Gui.py
+   ```
+4. A dark-themed chat interface will appear.
+5. In the message box at the bottom, type your question and hit **Send** or press **Enter**.
+
+### Important Note on Answers:
+The HAProxy configuration automatically relies on the backend GPU workers, which process questions using **RAG (Retrieval-Augmented Generation)**. 
+**This means that the AI engine strictly parses and retrieves answers based ONLY on the provided local `.txt` documents present in the `rag/knowledge/` directory.** It will provide sources and metrics as part of the interface output.
+
+---
+
