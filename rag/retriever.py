@@ -21,7 +21,7 @@ client = chromadb.PersistentClient(path=str(CHROMA_PATH))
 collection = client.get_collection(COLLECTION_NAME)
 
 
-def retrieve_context(query: str, top_k: int = 3) -> Dict[str, Any]:
+def retrieve_context(query: str, top_k: int = 1) -> Dict[str, Any]:
     start = time.perf_counter()
 
     query_embedding = embedding_model.encode(

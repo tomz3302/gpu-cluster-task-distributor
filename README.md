@@ -100,7 +100,7 @@ python -m pip install --upgrade pip
 Run:
 
 ```powershell
-pip install chromadb sentence-transformers tqdm fastapi uvicorn ollama pydantic httpx
+pip install chromadb sentence-transformers tqdm fastapi uvicorn ollama pydantic httpx nvidia-ml-py
 ```
 
 Optional: if the project has a `requirements.txt`, you can use:
@@ -120,6 +120,7 @@ uvicorn
 ollama
 pydantic
 httpx
+nvidia-ml-py
 ```
 
 ---
