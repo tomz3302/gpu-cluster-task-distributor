@@ -1,26 +1,67 @@
-# RAG-Enabled GPU Worker Setup Guide
+# Distributed RAG-Enabled GPU Cluster
 
-This guide explains how to set up and run one **RAG-enabled GPU worker node** on a teammate's PC.
+[![Python](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.100%2B-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Docker](https://img.shields.io/badge/Docker-Enabled-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
+[![Ollama](https://img.shields.io/badge/Ollama-Inference-white?logo=ollama&logoColor=black)](https://ollama.com/)
+[![ZeroTier](https://img.shields.io/badge/ZeroTier-Networking-FFB441?logo=zerotier&logoColor=white)](https://www.zerotier.com/)
 
-Each worker runs:
+## Project Overview
+This project establishes a **high-performance, distributed GPU cluster** specifically optimized for **Retrieval-Augmented Generation (RAG)**. By leveraging geographically distributed hardware, it creates a scalable inference engine where individual nodes contribute their GPU resources to a shared private network.
 
-```text
-FastAPI Worker API
-    ↓
-Local ChromaDB vector database
-    ↓
-Local RAG retriever
-    ↓
-Local Ollama LLM
-    ↓
-Response
-```
-
-The load balancer/master scheduler is intentionally **not included** in this guide. The goal is only to make each teammate's PC work as an individual worker node.
+The system is designed to handle hardware constraints by intelligently distributing load across multiple worker nodes, each equipped with its own local vector database and LLM engine.
 
 ---
 
-## 1. What each teammate needs to install
+## System Architecture Overview
+
+The system uses a **Master-Worker** architecture. A central Master node (HAProxy) acts as the entry point, distributing incoming requests across $n$ globally distributed worker nodes connected via a **ZeroTier** private network.
+
+### The Stack:
+*   **Frontend:** HAProxy (Load Balancer) + Python GUI/Client.
+*   **Network:** ZeroTier One (SD-WAN for private P2P communication).
+*   **Worker API:** FastAPI (Async Python).
+*   **Retrieval:** ChromaDB (Vector Database) + SentenceTransformers (Embeddings).
+*   **Inference:** Ollama (LLM Engine) running `smollm:135m`.
+
+### Architecture Diagram:
+
+```mermaid
+graph TD
+    User([User / GUI]) --> LB[HAProxy Load Balancer - Master Node]
+    
+    subgraph "ZeroTier Private Network"
+        LB --> W1[Worker 1 - GPU PC]
+        LB --> W2[Worker 2 - GPU PC]
+        LB --> Wn[Worker n - GPU PC]
+    end
+
+    subgraph "Worker Internals (Each Node)"
+        W1 --> API1[FastAPI Worker API]
+        API1 --> RAG1[Local RAG - ChromaDB]
+        API1 --> LLM1[Local LLM - Ollama]
+        
+        W2 --> API2[FastAPI Worker API]
+        API2 --> RAG2[Local RAG - ChromaDB]
+        API2 --> LLM2[Local LLM - Ollama]
+    end
+
+    RAG1 -.-> K1[(Local Knowledge Base)]
+    RAG2 -.-> K2[(Local Knowledge Base)]
+```
+
+### Request Lifecycle:
+1.  **Client Request:** A user sends a query through the GUI or a test script to the HAProxy Master Node (port `8080`).
+2.  **Load Balancing:** HAProxy uses the `leastconn` algorithm to forward the request to the worker with the fewest active connections.
+3.  **Worker Processing:**
+    *   The worker checks its local inference semaphore to manage GPU contention.
+    *   **Retrieval (RAG):** It queries its local ChromaDB instance to find relevant context from the uploaded documents.
+    *   **Generation (LLM):** It passes the query + retrieved context to the local Ollama instance.
+4.  **Response:** The worker returns the generated text, sources used, and detailed performance metrics (latency, retrieval time, etc.) back to the client.
+
+---
+
+## 2. What each teammate needs to install
 
 Install these on every worker PC:
 
@@ -29,38 +70,36 @@ Install these on every worker PC:
 3. **Ollama**
 4. **ZeroTier One**
 5. Project Python dependencies
+6. **Docker Desktop** (Required only for the Master Node running the Load Balancer)
 
 
 ---
 
-## 2. Required project folder structure
-
-After cloning or copying the project, the folder should look like this:
+## 2. Project Folder Structure
 
 ```text
 gpu-cluster-task-distributor/
-├── rag/
-│   ├── __init__.py
-│   ├── chroma_db/
-│   ├── knowledge/
-│   │   ├── Lectures/
-│   │   │   ├── Lecture1.txt
-│   │   │   ├── Lecture2.txt
-│   │   │   └── ...
-│   │   ├── Questions/
-│   │   │   ├── Lecture1-long.txt
-│   │   │   ├── Lecture1-short.txt
-│   │   │   └── ...
-│   │   └── Prompt.txt
-│   ├── index_local_chroma.py
-│   ├── retriever.py
-│   └── test_local_retrieval.py
-├── workers/
-│   ├── __init__.py
-│   └── gpu_worker_api.py
 ├── client/
-│   └── worker_load_test.py
-└── requirements.txt
+│   └── worker_load_test.py      # Direct worker performance tester
+├── rag/
+│   ├── chroma_db/               # Local vector database storage
+│   ├── knowledge/               # Source documents (.txt)
+│   │   ├── Lectures/            # Lecture content
+│   │   └── Questions/           # Sample questions
+│   ├── index_local_chroma.py    # Builds/updates the vector index
+│   ├── retriever.py             # RAG logic & context retrieval
+│   └── test_local_retrieval.py  # Standalone RAG test script
+├── tests/
+│   ├── load_test.py             # Cluster burst load tester
+│   ├── sustained_users_test.py  # Long-term resilience tester
+│   ├── questions.json           # Test question pool
+│   └── test_ollama.py           # Ollama connectivity check
+├── workers/
+│   └── gpu_worker_api.py        # FastAPI Worker implementation
+├── docker-compose.yml           # HAProxy deployment (Master)
+├── haproxy.cfg                  # Load balancer configuration
+├── Simple_Gui.py                # Dark-themed Chat GUI
+└── requirements.txt             # Python dependencies
 ```
 
 Important notes:
@@ -581,7 +620,27 @@ Notes: RAG enabled, top_k=3
 
 ---
 
-## 21. Troubleshooting
+## 21. Testing Strategy
+
+The project includes a comprehensive suite of tests to verify individual components and overall cluster performance.
+
+### 1. Component Verification
+*   **Ollama Connectivity:** `python tests/test_ollama.py` checks if the worker can talk to the local Ollama instance and run inference.
+*   **RAG Retrieval:** `python rag/test_local_retrieval.py` verifies that documents are correctly indexed in ChromaDB and can be retrieved using semantic search.
+
+### 2. Performance & Load Testing
+*   **Single Worker Benchmark:** `python client/worker_load_test.py` tests a specific worker URL (direct or via ZeroTier) with increasing concurrency to find its throughput limit.
+*   **Cluster Burst Test:** `python tests/load_test.py` sends high-concurrency bursts to the HAProxy Load Balancer to measure system-wide peak throughput and response latency.
+*   **Sustained Resilience Test:** `python tests/sustained_users_test.py` simulates realistic user behavior with "think times" over a long duration (e.g., 60s). It tracks:
+    *   **RPS:** Requests per second.
+    *   **P95 Latency:** The response time for the slowest 5% of requests.
+    *   **Worker Fairness:** Verifies that HAProxy is distributing load evenly across all active workers.
+
+To run these tests, ensure your virtual environment is active and point the `LB_BASE_URL` or `WORKER_URL` in the scripts to your target.
+
+---
+
+## 22. Troubleshooting
 
 ### Problem: `ModuleNotFoundError: No module named 'rag'`
 
@@ -690,7 +749,29 @@ MAX_TOKENS = 64
 
 ---
 
-## 22. Running the GUI Chat Interface
+## 22. Setting up the Load Balancer (Master Node)
+
+The load balancer (HAProxy) distributes incoming requests across all active worker nodes.
+
+### Prerequisites:
+- **Docker Desktop** installed and running.
+
+### Steps:
+1.  **Configure `haproxy.cfg`**:
+    Update the `backend worker_nodes` section in `haproxy.cfg` with the ZeroTier IPs of your teammates.
+2.  **Pull and Run HAProxy**:
+    From the project root, run:
+    ```powershell
+    docker-compose up -d
+    ```
+    This command will automatically pull the `haproxy:latest` image and start the container in detached mode.
+3.  **Verify the Load Balancer**:
+    - Access the **Stats Dashboard**: `http://localhost:8404/stats` (User: `admin`, Pass: `admin`).
+    - Test the **Frontend API**: `http://localhost:8080/generate`.
+
+---
+
+## 23. Running the GUI Chat Interface
 
 We have built a simple, sleek chat GUI to interact with the cluster!
 
