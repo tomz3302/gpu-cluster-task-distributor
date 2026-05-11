@@ -2,6 +2,8 @@ import asyncio
 import collections
 import statistics
 import time
+import json
+import random
 
 import httpx
 
@@ -13,9 +15,18 @@ import httpx
 LB_BASE_URL = "http://127.0.0.1:8080"
 LB_URL = f"{LB_BASE_URL}/generate"
 
-PROMPT = "Explain what load balancing is in one short paragraph."
-MAX_TOKENS = 64
+# Load questions from JSON
+QUESTIONS_FILE = "tests/questions.json"
+try:
+    with open(QUESTIONS_FILE, "r", encoding="utf-8") as f:
+        QUESTION_POOL = json.load(f)
+except Exception as e:
+    print(f"Warning: Could not load {QUESTIONS_FILE}: {e}")
+    QUESTION_POOL = ["Explain what load balancing is in one short paragraph."]
+
+MAX_TOKENS = 128
 TEMPERATURE = 0.2
+TOP_K = 1
 
 # ---------------------------------------------------------------
 # Utilities
@@ -39,15 +50,17 @@ def print_separator():
 # ---------------------------------------------------------------
 
 async def send_request(client: httpx.AsyncClient, request_id: int) -> dict:
+    prompt = random.choice(QUESTION_POOL)
     start = time.perf_counter()
     try:
         response = await client.post(
             LB_URL,
             json={
                 "id": request_id,
-                "query": PROMPT,
+                "query": prompt,
                 "max_tokens": MAX_TOKENS,
                 "temperature": TEMPERATURE,
+                "top_k": TOP_K,
                 "use_rag": True,
             },
             timeout=180,
@@ -58,10 +71,8 @@ async def send_request(client: httpx.AsyncClient, request_id: int) -> dict:
             return {
                 "success": False,
                 "latency": total_latency,
-                "queue_time": 0.0,
                 "retrieval_time": 0.0,
                 "inference_time": 0.0,
-                "idle_time": 0.0,
                 "error": response.text,
             }
 
@@ -73,7 +84,7 @@ async def send_request(client: httpx.AsyncClient, request_id: int) -> dict:
             "queue_time": data.get("queue_time", 0.0),
             "retrieval_time": data.get("retrieval_time", 0.0),
             "inference_time": data.get("inference_time", 0.0),
-            "idle_time": data.get("idle_time", 0.0),
+            "gpu_util": data.get("gpu_utilization", 0.0),
             "error": None,
         }
 
@@ -84,7 +95,7 @@ async def send_request(client: httpx.AsyncClient, request_id: int) -> dict:
             "queue_time": 0.0,
             "retrieval_time": 0.0,
             "inference_time": 0.0,
-            "idle_time": 0.0,
+            "gpu_util": 0.0,
             "error": str(e),
         }
 
@@ -136,23 +147,40 @@ async def run_test(concurrency: int, total_requests: int) -> dict:
     avg_inference_time = statistics.mean(inference_times) if inference_times else 0.0
     
     # Group results by worker
-    worker_results = collections.defaultdict(list)
+    worker_stats = collections.defaultdict(lambda: {
+        "latencies": [],
+        "queue_times": [],
+        "retrieval_times": [],
+        "inference_times": [],
+        "gpu_utils": []
+    })
     for r in successes:
-        worker_results[r["worker_name"]].append(r["idle_time"])
+        ws = worker_stats[r["worker_name"]]
+        ws["latencies"].append(r["latency"])
+        ws["queue_times"].append(r["queue_time"])
+        ws["retrieval_times"].append(r["retrieval_time"])
+        ws["inference_times"].append(r["inference_time"])
+        ws["gpu_utils"].append(r["gpu_util"])
 
-    # Calculate per-worker utilization
+    # Calculate per-worker hardware utilization and metrics
     worker_utilizations = []
-    print(f"Workers detected: {len(worker_results)}")
-    for worker, idle_snapshots in worker_results.items():
-        if len(idle_snapshots) >= 2:
-            # idle_snapshots is cumulative. Utilization = 1 - (delta_idle / total_time)
-            delta_idle = max(idle_snapshots) - min(idle_snapshots)
-            u = 1.0 - (delta_idle / total_time)
-            u = max(0.0, min(1.0, u)) # Clamp to [0, 1]
+    print(f"Workers detected: {len(worker_stats)}")
+    for worker, stats in worker_stats.items():
+        if stats["gpu_utils"]:
+            # Use hardware reported average
+            u = statistics.mean(stats["gpu_utils"]) / 100.0
+            u = max(0.0, min(1.0, u)) 
             worker_utilizations.append(u)
-            print(f"  - {worker}: {u * 100:.2f}% utilization")
+            
+            avg_lat = statistics.mean(stats["latencies"])
+            avg_ret = statistics.mean(stats["retrieval_times"])
+            avg_inf = statistics.mean(stats["inference_times"])
+            
+            print(f"  - {worker}:")
+            print(f"      GPU Util (Avg): {u * 100:.2f}%")
+            print(f"      Avg Latency: {avg_lat:.3f}s | Retr: {avg_ret:.3f}s | Infer: {avg_inf:.3f}s")
         else:
-            print(f"  - {worker}: Insufficient data (<2 requests)")
+            print(f"  - {worker}: No GPU data reported")
 
     cluster_utilization = statistics.mean(worker_utilizations) if worker_utilizations else 0.0
 
@@ -164,10 +192,10 @@ async def run_test(concurrency: int, total_requests: int) -> dict:
     print(f"P95 latency:             {p95_latency:.2f} s")
     print(f"Min latency:             {min_latency:.2f} s")
     print(f"Max latency:             {max_latency:.2f} s")
-    print(f"Average queue time:      {avg_queue_time:.2f} s")
     print(f"Average retrieval time:  {avg_retrieval_time:.2f} s")
     print(f"Average inference time:  {avg_inference_time:.2f} s")
-    print(f"Cluster Utilization:     {cluster_utilization * 100:.2f}%")
+    print(f"Cluster GPU Load (Avg):  {cluster_utilization * 100:.2f}%")
+
 
     if failures:
         print(f"Example error:           {failures[0]['error']}")
@@ -199,15 +227,15 @@ def print_summary(all_results: list[dict]):
     print("BENCHMARK SUMMARY")
     print_separator()
 
-    col_w = [6, 6, 6, 6, 8, 8, 8, 8, 8, 8, 8, 8]
+    col_w = [6, 6, 6, 6, 8, 8, 8, 8, 8, 8, 12]
     headers = [
         "Conc.", "Total", "OK", "Fail",
         "Time(s)", "Req/s", "Avg(s)", "P95(s)",
-        "Queue(s)", "Retr(s)", "Infer(s)", "Utilization"
+        "Retr(s)", "Infer(s)", "Utilization"
     ]
     row_fmt = "  ".join(f"{{:<{w}}}" for w in col_w)
     print(row_fmt.format(*headers))
-    print("-" * 120)
+    print("-" * 110)
 
     for r in all_results:
         print(row_fmt.format(
@@ -219,7 +247,6 @@ def print_summary(all_results: list[dict]):
             r["throughput_req_per_sec"],
             r["avg_latency_sec"],
             r["p95_latency_sec"],
-            r["avg_queue_time_sec"],
             r["avg_retrieval_time_sec"],
             r["avg_inference_time_sec"],
             f"{r['utilization']*100:.1f}%",
